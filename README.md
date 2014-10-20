@@ -4,3 +4,4 @@ This project is an example implementation to learn and evaluate the Raft consens
 
 Team members: Anders Nielsen (s103457) and Joachim Friis (s093256)
 
+Testing commit
