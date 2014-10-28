@@ -8,12 +8,16 @@ Team members: Anders Nielsen (s103457) and Joachim Friis (s093256)
 
 To get up and running easily, install node and type:
 
-```npm install```
+```
+npm install
+```
 
 which will install the dependencies given in `package.json`.
 
 To run the tests, type:
 
-```mocha```
+```
+mocha
+```
 
 in the console.
