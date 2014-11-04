@@ -1,10 +1,10 @@
 Server = (function() {
-  function Server(id, peers, state) {
+  function Server(id, peers, state, currentTerm) {
     this.id = id;
     this.peers = peers;
     this.state = state || 'follower';
     this.log = [];
-    this.currentTerm = 0;
+    this.currentTerm = currentTerm || 0;
     this.votedFor = null;
   };
 
@@ -60,13 +60,14 @@ Server = (function() {
     this.votedFor = this.id;
   };
 
-  Server.prototype.sendRequestVote = function(targetPeer) {
+  Server.prototype.invokeVoteRequest = function(targetPeer) {
     return targetPeer.onReceiveRequestVote(
+      this,
       {
         "term": this.currentTerm,
         "candidateId": this.id,
         "lastLogIndex": this.lastLogIndex(),
-        "lastLogTerm": this.lastLogEntry()
+        "lastLogTerm": this.lastLogTerm()
       }
     )
   }
@@ -75,8 +76,49 @@ Server = (function() {
     return this.log.length - 1;
   }
 
-  Server.prototype.onReceiveRequestVote = function(requestVote) {
+  Server.prototype.onReceiveRequestVote = function(sourcePeer, requestVote) {
+    this.onRemoteProcedureCall(requestVote);
 
+    if (this.isValidVote(requestVote)) {
+      this.votedFor = requestVote.candidateId;
+      return sourcePeer.invokeVoteResponse({ "term": requestVote.term, "voteGranted": true })
+    } else {
+      return sourcePeer.invokeVoteResponse({ "term": this.currentTerm, "voteGranted": false })
+    }
+  }
+
+  Server.prototype.invokeVoteResponse = function(requestVoteResult) {
+    this.onRemoteProcedureCall(requestVoteResult);
+    return requestVoteResult;
+  }
+
+
+
+  // Rules for Servers: If RPC request or response contains term T > currentTerm:
+  // set currentTerm = T, convert to follower
+  Server.prototype.onRemoteProcedureCall = function(rpc) {
+    if (rpc.term > this.currentTerm) {
+      this.currentTerm = rpc.term;
+      this.state = 'follower';
+    }
+  }  
+
+  Server.prototype.isValidVote = function(requestVote) {
+    return requestVote.term >= this.currentTerm &&
+      (this.votedFor === null || this.votedFor === requestVote.candidateId) &&
+      this.isRequestLogAtLeastUpdToDate(requestVote.lastLogIndex, requestVote.lastLogTerm);
+  }
+
+  Server.prototype.isRequestLogAtLeastUpdToDate = function(logIndex, logTerm) {
+    return this.lastLogIndex() <= logIndex && this.lastLogTerm() <= logTerm;
+  }
+
+  Server.prototype.lastLogTerm = function() {
+    if (this.log.length === 0) {
+      return 0;
+    } else {
+      return this.lastLogEntry().term;
+    }
   }
 
 
