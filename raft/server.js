@@ -18,7 +18,7 @@ Server = (function() {
 
   Server.prototype.onReceiveRequest = function(logEntry) {
     if (this.isLeader()) {
-      this.log.push(logEntry);
+      this.log.push({"index": logEntry.index, "term": this.currentTerm});
       return {
         "isSuccessful": true,
         "leaderId": this.id

@@ -5,9 +5,11 @@ var Server = require('../raft/server');
 describe("Client Log Entry Request", function() {
   it("client sends log request to server", function() {
     var server = new Server(1, [], 'leader');
-    var response = server.onReceiveRequest(1);
+    var logEntry = {"index": 1};
+    var response = server.onReceiveRequest(logEntry);
     assert.equal(server.log.length, 1);
-    assert.equal(server.lastLogEntry(), 1);
+    assert.equal(server.lastLogEntry().index, 1);
+    assert.equal(server.lastLogEntry().term, 0);
     assert.equal(response.isSuccessful, true);
 
   });
