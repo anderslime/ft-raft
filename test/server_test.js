@@ -4,7 +4,7 @@ var Server = require('../raft/server');
 describe("Server", function() {
   it("is created with paramters", function() {
     var server = new Server(1, [], 'follower');
-    assert.equal(server.index, 1);
+    assert.equal(server.id, 1);
     assert.sameMembers(server.peers, []);
     assert.equal(server.state, 'follower');
   });

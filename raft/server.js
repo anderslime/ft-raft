@@ -1,6 +1,6 @@
 Server = (function() {
-  function Server(index, peers, state) {
-    this.index = index;
+  function Server(id, peers, state) {
+    this.id = id;
     this.peers = peers;
     this.state = state || 'follower';
     this.log = [];
@@ -15,15 +15,47 @@ Server = (function() {
   };
 
   Server.prototype.onReceiveRequest = function(logEntry) {
-    this.log.push(logEntry);
-  }
+    if (this.isLeader()) {
+      this.log.push(logEntry);
+      return {
+        "isSuccessful": true,
+        "leaderId": this.id
+      }
+    } else {
+      return {
+        "isSuccessful": false,
+        "leaderId": this.findLeader().id
+      }
+    }
+  };
 
   Server.prototype.lastLogEntry = function() {
     return this.log[this.log.length - 1];
+  };
+
+  Server.prototype.addPeer = function(server){
+    this.peers.push(server);
+  };
+
+  Server.prototype.isLeader = function() {
+    return this.state == 'leader';
   }
+
+  Server.prototype.findLeader = function() {
+    var leader = {};
+    for (peerIndex in this.peers) {
+      var peer = this.peers[peerIndex];
+      if (peer.isLeader()) {
+        leader = peer;
+      }
+    }
+    return leader;
+  }
+
 
   return Server;
 
 })();
+
 
 module.exports = Server;
