@@ -4,6 +4,7 @@
   "description": "Fault-Tolerant Raft",
   "keywords": "raft fault-tolerance",
   "homepage": "https://github.com/anderslime/ft-raft",
+  "repository": "https://github.com/anderslime/ft-raft",
   "license": "MIT",
   "contributors": [
     {
