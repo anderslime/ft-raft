@@ -4,6 +4,8 @@ Server = (function() {
     this.peers = peers;
     this.state = state || 'follower';
     this.log = [];
+    this.currentTerm = 0;
+    this.votedFor = null;
   };
 
   Server.prototype.becomeLeader = function() {
@@ -30,7 +32,7 @@ Server = (function() {
   };
 
   Server.prototype.lastLogEntry = function() {
-    return this.log[this.log.length - 1];
+    return this.log[this.lastLogIndex()];
   };
 
   Server.prototype.addPeer = function(server){
@@ -50,6 +52,31 @@ Server = (function() {
       }
     }
     return leader;
+  }
+
+  Server.prototype.onTimeout = function(){
+    this.state = "candidate";
+    this.currentTerm += 1;
+    this.votedFor = this.id;
+  };
+
+  Server.prototype.sendRequestVote = function(targetPeer) {
+    return targetPeer.onReceiveRequestVote(
+      {
+        "term": this.currentTerm,
+        "candidateId": this.id,
+        "lastLogIndex": this.lastLogIndex(),
+        "lastLogTerm": this.lastLogEntry()
+      }
+    )
+  }
+
+  Server.prototype.lastLogIndex = function() {
+    return this.log.length - 1;
+  }
+
+  Server.prototype.onReceiveRequestVote = function(requestVote) {
+
   }
 
 
