@@ -1,6 +1,16 @@
 var assert = require('chai').assert;
 var Server = require('../raft/server');
 
+updatePeers = function(servers) {
+  for (serverId in servers) {
+    for (otherServerId in servers) {
+      if (otherServerId != serverId) {
+        servers[serverId].addPeer(servers[otherServerId]);
+      }
+    }
+  }
+}
+
 
 describe("Leader election", function() {
   it("CurrentTerm is 0 at start", function() {
@@ -13,9 +23,9 @@ describe("Leader election", function() {
 
   });*/
 
-  it("Server timeouts and becomes a candidate", function(){
+  it("Server timeouts and becomes a candidate when without election", function(){
     var server = new Server(1, [], 'follower');
-    server.onTimeout();
+    server.onTimeout(false);
     assert.equal(server.state, "candidate");
   });
 
@@ -27,6 +37,28 @@ describe("Leader election", function() {
 
     //TODO test for reset electiontimer
 
+  });
+
+  describe("server sends RequestVote to all other servers", function() {
+    it("all other servers sets votedFor to candidate", function() {
+      var server1 = new Server(1, [], 'follower');
+      var server2 = new Server(2, [], 'follower');
+      var server3 = new Server(3, [], 'follower');
+      updatePeers([server1, server2, server3])
+      server1.onTimeout()
+      assert.equal(server2.votedFor, 1)
+      assert.equal(server3.votedFor, 1)
+    });
+
+    it("all other servers updates their term", function() {
+      var server1 = new Server(1, [], 'follower');
+      var server2 = new Server(2, [], 'follower');
+      var server3 = new Server(3, [], 'follower');
+      updatePeers([server1, server2, server3])
+      server1.onTimeout()
+      assert.equal(server2.currentTerm, server1.currentTerm)
+      assert.equal(server3.currentTerm, server1.currentTerm)
+    });
   });
 
   describe("Requesting vote on election", function() {
@@ -80,11 +112,30 @@ describe("Leader election", function() {
       var voteResponse = server1.invokeVoteRequest(server2);
       assert.equal(voteResponse.voteGranted, false);  
     });
+  });
 
-  })
+  describe("Evaluating leadership", function() {
+    // Rules for Servers: Candidates: If votes received from majority of servers: become leader
+    it("becomes a leader when it has received the majority of votes", function() {
+      var server1 = new Server(1, [], 'follower');
+      var server2 = new Server(2, [], 'follower');
+      var server3 = new Server(3, [], 'follower');
+      updatePeers([server1, server2, server3])
+      server1.onTimeout()
+      assert.equal(server1.state, 'leader');
+    });
 
-
-
+    // Rules for Servers: Candidates: If votes received from majority of servers: become leader
+    it("becomes a leader when it has received the majority of votes", function() {
+      var server1 = new Server(1, [], 'follower');
+      var server2 = new Server(2, [], 'follower');
+      var server3 = new Server(3, [], 'follower');
+      updatePeers([server1, server2, server3])
+      server3.onTimeout()
+      server1.onTimeout()
+      assert.equal(server3.state, 'leader');
+    });
+  });
 });
 
 

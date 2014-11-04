@@ -12,10 +12,6 @@ Server = (function() {
     this.state = 'leader';
   };
 
-  Server.prototype.startElection = function() {
-    this.state = 'candidate';
-  };
-
   Server.prototype.onReceiveRequest = function(logEntry) {
     if (this.isLeader()) {
       this.log.push({"index": logEntry.index, "term": this.currentTerm});
@@ -54,11 +50,23 @@ Server = (function() {
     return leader;
   }
 
-  Server.prototype.onTimeout = function(){
+  Server.prototype.onTimeout = function(withElection){
+    if (withElection === undefined) withElection = true;
     this.state = "candidate";
+    if (withElection) {
+      this.startElection()
+    }
+  };
+
+  Server.prototype.startElection = function() {
     this.currentTerm += 1;
     this.votedFor = this.id;
-  };
+    var voteResponses = [];
+    for (peerIndex in this.peers) {
+      voteResponses.push(this.invokeVoteRequest(this.peers[peerIndex]))
+    }
+    this.becomeLeader();
+  }
 
   Server.prototype.invokeVoteRequest = function(targetPeer) {
     return targetPeer.onReceiveRequestVote(

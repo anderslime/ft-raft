@@ -14,12 +14,4 @@ describe("Server", function() {
     server.becomeLeader();
     assert.equal(server.state, 'leader');
   });
-
-  context("when starting an election", function() {
-    it("becomes a candidate", function() {
-      var server = new Server(1, [], 'follower');
-      server.startElection();
-      assert.equal(server.state, 'candidate');
-    });
-  });
 });
