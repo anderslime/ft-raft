@@ -1,0 +1,29 @@
+\begin{thebibliography}{1}
+
+\bibitem{Bailey}
+Michael Bailey, Evan Cooke, Farnam Jahanian, Yunjing Xu, and Manish Karir.
+\newblock A survey of botnet technology and defenses.
+\newblock In {\em Proceedings of the 2009 Cybersecurity Applications \&
+  Technology Conference for Homeland Security}, CATCH '09, pages 299--304,
+  Washington, DC, USA, 2009. IEEE Computer Society.
+
+\bibitem{MD5}
+John Black, Martin Cochran, and Trevor Highland.
+\newblock A study of the md5 attacks: Insights and improvements.
+\newblock In Matthew Robshaw, editor, {\em Fast Software Encryption}, volume
+  4047 of {\em Lecture Notes in Computer Science}, pages 262--277. Springer
+  Berlin Heidelberg, 2006.
+
+\bibitem{top}
+David Dagon, Guofei Gu, and ChristopherP. Lee.
+\newblock A taxonomy of botnet structures.
+\newblock In Wenke Lee, Cliff Wang, and David Dagon, editors, {\em Botnet
+  Detection}, volume~36 of {\em Advances in Information Security}, pages
+  143--164. Springer US, 2008.
+
+\bibitem{frontimage}
+William Rex.
+\newblock The zombies all around you.
+\newblock \url{http://www.meannnasty.com/zombies-around/}, april 2014.
+
+\end{thebibliography}
