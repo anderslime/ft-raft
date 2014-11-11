@@ -65,7 +65,16 @@ Server = (function() {
     for (peerIndex in this.peers) {
       voteResponses.push(this.invokeVoteRequest(this.peers[peerIndex]))
     }
-    this.becomeLeader();
+    this.becomeLeaderIfMajorityOfVotesReceived(voteResponses);
+  }
+
+  Server.prototype.becomeLeaderIfMajorityOfVotesReceived = function(voteResponses) {
+    positiveVotes = voteResponses.filter(function(voteResponse) {
+      return voteResponse.voteGranted;
+    });
+    if (this.hasGrantedMajorityOfVotes(positiveVotes)) {
+      this.becomeLeader();
+    }
   }
 
   Server.prototype.invokeVoteRequest = function(targetPeer) {
@@ -100,8 +109,6 @@ Server = (function() {
     return requestVoteResult;
   }
 
-
-
   // Rules for Servers: If RPC request or response contains term T > currentTerm:
   // set currentTerm = T, convert to follower
   Server.prototype.onRemoteProcedureCall = function(rpc) {
@@ -109,7 +116,7 @@ Server = (function() {
       this.currentTerm = rpc.term;
       this.state = 'follower';
     }
-  }  
+  }
 
   Server.prototype.isValidVote = function(requestVote) {
     return requestVote.term >= this.currentTerm &&
@@ -129,6 +136,26 @@ Server = (function() {
     }
   }
 
+  Server.prototype.hasGrantedMajorityOfVotes = function(positiveVotes) {
+    serversOwnVote = (this.votedFor == this.id) ? 1 : 0
+    return positiveVotes.length + serversOwnVote >= this.peerMajoritySize()
+  }
+
+  Server.prototype.peerMajoritySize = function() {
+    if (this.hasEventNumberOfPeersInNetwork()) {
+      return this.networkPeerSize() / 2 + 1
+    } else {
+      return Math.ceil(this.networkPeerSize())
+    }
+  }
+
+  Server.prototype.hasEventNumberOfPeersInNetwork = function() {
+    return this.networkPeerSize() % 2 == 0;
+  }
+
+  Server.prototype.networkPeerSize = function() {
+    return this.peers.length + 1;
+  }
 
   return Server;
 

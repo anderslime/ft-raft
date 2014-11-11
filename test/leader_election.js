@@ -13,15 +13,11 @@ updatePeers = function(servers) {
 
 
 describe("Leader election", function() {
+  // Rules for Servers: Followers ($5.2)
   it("CurrentTerm is 0 at start", function() {
     var server = new Server(1, [], 'follower');
     assert.equal(server.currentTerm, 0);
   });
-
-/*  it("Server timeouts after 0.1 second", function(){
-    var server = new Server(1, [], 'follower');
-
-  });*/
 
   it("Server timeouts and becomes a candidate when without election", function(){
     var server = new Server(1, [], 'follower');
@@ -110,17 +106,58 @@ describe("Leader election", function() {
     });
   });
 
-  describe("Evaluating leadership", function() {
-    // Rules for Servers: Candidates: If votes received from majority of servers: become leader
-    it("becomes a leader when it has received the majority of votes", function() {
-      var server1 = new Server(1, [], 'follower');
-      var server2 = new Server(2, [], 'follower');
-      var server3 = new Server(3, [], 'follower');
-      updatePeers([server1, server2, server3])
-      server1.onTimeout()
-      assert.equal(server1.state, 'leader');
+  describe("If votes received from majority of servers, become leader", function() {
+    describe("with 5 peers in network", function() {
+      it("becomes leader when receiving 3 votes", function() {
+        var server1 = new Server(1, [], 'follower');
+        var server2 = new Server(2, [], 'follower');
+        var server3 = new Server(3, [], 'follower');
+        var server4 = new Server(4, [], 'follower');
+        var server5 = new Server(5, [], 'candidate');
+        server4.votedFor = 5;
+        server5.votedFor = 5;
+        updatePeers([server1, server2, server3])
+        server1.onTimeout()
+        assert.equal(server1.state, 'leader');
+      });
+
+      it("does not become leader when receiving 2 votes", function() {
+        var server1 = new Server(1, [], 'follower');
+        var server2 = new Server(2, [], 'follower');
+        var server3 = new Server(3, [], 'follower');
+        var server4 = new Server(4, [], 'follower');
+        var server5 = new Server(5, [], 'candidate');
+        server3.votedFor = 5;
+        server4.votedFor = 5;
+        server5.votedFor = 5;
+        updatePeers([server1, server2, server3]);
+        server1.onTimeout();
+        assert.equal(server1.state, 'candidate');
+      });
+    });
+
+    describe("with 4 peers in network", function() {
+      it("becomes leader when receiving 3 votes", function() {
+        var server1 = new Server(1, [], 'follower');
+        var server2 = new Server(2, [], 'follower');
+        var server3 = new Server(3, [], 'follower');
+        var server4 = new Server(4, [], 'candidate');
+        server4.votedFor = 4;
+        updatePeers([server1, server2, server3])
+        server1.onTimeout()
+        assert.equal(server1.state, 'leader');
+      });
+
+      it("does not become leader when only receiving 2 votes", function() {
+        var server1 = new Server(1, [], 'follower');
+        var server2 = new Server(2, [], 'follower');
+        var server3 = new Server(3, [], 'candidate');
+        server2.votedFor = 3;
+        server3.votedFor = 3;
+        updatePeers([server1, server2, server3]);
+        server1.onTimeout();
+        assert.equal(server1.state, 'candidate');
+      });
     });
   });
 });
-
-
