@@ -11,12 +11,19 @@ updatePeers = function(servers) {
   }
 }
 
+// Rules for Servers: Followers ($5.2)
+describe("Rules for Followers", function() {
+  describe("Respond to RPCs from candidates and leaders", function() {
+    it("responds to RequestVote RPCs from candidate", function() {
+      var server1 = new Server(1, [], 'follower');
+      var server2 = new Server(2, [], 'candidate');
+      response = server2.invokeVoteRequest(server1);
+      assert.isNotNull(response);
+    });
 
-describe("Leader election", function() {
-  // Rules for Servers: Followers ($5.2)
-  it("CurrentTerm is 0 at start", function() {
-    var server = new Server(1, [], 'follower');
-    assert.equal(server.currentTerm, 0);
+    it("responds to AppendEntries RPC from leader", function() {
+      // TODO: Implement this with AppendEntries
+    });
   });
 
   it("Server timeouts and becomes a candidate when without election", function(){
@@ -30,17 +37,16 @@ describe("Leader election", function() {
     server.onTimeout();
     assert.equal(server.currentTerm, 1);
     assert.equal(server.votedFor, 1);
-
-    //TODO test for reset electiontimer
-
   });
+});
 
   // Rules for servers: Candidates ($5.2)
+describe("Rules for Candidates", function() {
   describe("On conversion to candidate, start election:", function() {
     it("increments currentTerm", function() {
       var server1 = new Server(1, [], 'follower', 1);
       server1.onTimeout();
-      assert.equal(server1.currentTerm, 2)
+      assert.equal(server1.currentTerm, 2);
     });
 
     it("votes for self", function() {
@@ -158,6 +164,18 @@ describe("Leader election", function() {
         server1.onTimeout();
         assert.equal(server1.state, 'candidate');
       });
+    });
+  });
+
+  describe("If AppendEntries RPC received from new leader: convert to follower", function() {
+    it("becomes follower when receiving AppendEntries from leader", function() {
+      // TODO: Implement this rule
+    });
+  });
+
+  describe("If election timeout elapses: start new election", function() {
+    it("starts new election on timeout", function() {
+      // TODO: Implement this rule
     });
   });
 });
