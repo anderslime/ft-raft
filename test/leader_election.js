@@ -176,6 +176,44 @@ describe("Rules for Candidates", function() {
     });
   });
 
+  describe("Receiver AppendEntries Implementation", function() {
+    it("replies false if term < currentTerm", function() {
+      var server1 = new Server(2, [], 'leader',1);
+      var server2 = new Server(3, [], 'candidate',2);
+      var result = server1.invokeAppendEntries(server2);
+      assert.equal(result.success, false);
+    });
+    it("replies true if term >= currentTerm", function() {
+      var server1 = new Server(2, [], 'leader',2);
+      var server2 = new Server(3, [], 'candidate',2);
+      var result = server1.invokeAppendEntries(server2);
+      assert.equal(result.success, true);
+    });
+    it("reply false if log doesn't contain entry at prevLogIndex", function() {
+      var server1 = new Server(1, [], 'leader',2);
+      server1.log = [{"index": 1, "term": 2}];
+      var server2 = new Server(2, [], 'follower',2);
+      var result = server1.invokeAppendEntries(server2);
+      assert.equal(result.success, false);
+    });
+    it("reply false if log doesn't contain entry at prevLogIndex whose terms matches prevLogTerm", function() {
+      var server1 = new Server(1, [], 'leader',2);
+      server1.log = [{"index": 1, "term": 2}];
+      var server2 = new Server(2, [], 'follower',2);
+      server2.log = [{"index": 1, "term": 1}];
+      var result = server1.invokeAppendEntries(server2);
+      assert.equal(result.success, false);
+    });
+    it("reply true if log does contain entry at prevLogIndex whose terms matches prevLogTerm", function() {
+      var server1 = new Server(1, [], 'leader');
+      server1.log = [{"index": 1, "term": 1}];
+      var server2 = new Server(2, [], 'follower');
+      server2.log = [{"index": 1, "term": 1}];
+      var result = server1.invokeAppendEntries(server2);
+      assert.equal(result.success, true);
+    });
+  });
+
   describe("If election timeout elapses: start new election", function() {
     it("starts new election on timeout", function() {
       // TODO: Implement this rule

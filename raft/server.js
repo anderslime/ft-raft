@@ -90,6 +90,7 @@ Server = (function() {
   }
 
   Server.prototype.lastLogIndex = function() {
+    if (this.log.length === 0) return null;
     return this.log.length - 1;
   }
 
@@ -107,7 +108,21 @@ Server = (function() {
   Server.prototype.onReceiveAppendEntries = function(sourcePeer, appendEntries) {
     this.onRemoteProcedureCall(appendEntries);
     this.state = "follower";
-    return sourcePeer.invokeAppendEntriesResponse({"term": this.currentTerm, "success": true});
+    return sourcePeer.invokeAppendEntriesResponse(
+      {"term": this.currentTerm, 
+       "success": this.appendEntriesSuccessResult(appendEntries)
+      });
+  }
+
+  Server.prototype.appendEntriesSuccessResult = function(appendEntries) {
+    return !(appendEntries.term < this.currentTerm) &&
+            this.containsLogEntryWithSameTerm(appendEntries)
+  }
+
+  Server.prototype.containsLogEntryWithSameTerm = function(appendEntries) {
+    return (appendEntries.prevLogIndex === null) ||
+           (this.log[appendEntries.prevLogIndex] !== undefined &&
+           this.log[appendEntries.prevLogIndex].term === appendEntries.prevLogTerm);
   }
 
 
