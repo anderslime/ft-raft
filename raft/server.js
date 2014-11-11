@@ -104,9 +104,35 @@ Server = (function() {
     }
   }
 
+  Server.prototype.onReceiveAppendEntries = function(sourcePeer, appendEntries) {
+    this.onRemoteProcedureCall(appendEntries);
+    this.state = "follower";
+    return sourcePeer.invokeAppendEntriesResponse({"term": this.currentTerm, "success": true});
+  }
+
+
   Server.prototype.invokeVoteResponse = function(requestVoteResult) {
     this.onRemoteProcedureCall(requestVoteResult);
     return requestVoteResult;
+  }
+
+  Server.prototype.invokeAppendEntriesResponse = function(appendEntriesResult) {
+    this.onRemoteProcedureCall(appendEntriesResult);
+    return appendEntriesResult;
+  }
+
+  Server.prototype.invokeAppendEntries = function(targetPeer) {
+    return targetPeer.onReceiveAppendEntries(
+      this,
+      {
+        "term": this.currentTerm,
+        "leaderId": this.id,
+        "prevLogIndex": this.lastLogIndex(),
+        "prevLogTerm": this.lastLogTerm(),
+        "entries": [],
+        "leaderCommit": null
+      }
+    )
   }
 
   // Rules for Servers: If RPC request or response contains term T > currentTerm:

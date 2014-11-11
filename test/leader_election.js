@@ -169,7 +169,10 @@ describe("Rules for Candidates", function() {
 
   describe("If AppendEntries RPC received from new leader: convert to follower", function() {
     it("becomes follower when receiving AppendEntries from leader", function() {
-      // TODO: Implement this rule
+      var server1 = new Server(2, [], 'leader');
+      var server2 = new Server(3, [], 'candidate');
+      server1.invokeAppendEntries(server2);
+      assert.equal(server2.state,'follower');
     });
   });
 
