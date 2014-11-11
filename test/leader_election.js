@@ -177,18 +177,21 @@ describe("Rules for Candidates", function() {
   });
 
   describe("Receiver AppendEntries Implementation", function() {
+    // Rule 1
     it("replies false if term < currentTerm", function() {
       var server1 = new Server(2, [], 'leader',1);
       var server2 = new Server(3, [], 'candidate',2);
       var result = server1.invokeAppendEntries(server2);
       assert.equal(result.success, false);
     });
+    // Rule 1
     it("replies true if term >= currentTerm", function() {
       var server1 = new Server(2, [], 'leader',2);
       var server2 = new Server(3, [], 'candidate',2);
       var result = server1.invokeAppendEntries(server2);
       assert.equal(result.success, true);
     });
+    // Rule 2
     it("reply false if log doesn't contain entry at prevLogIndex", function() {
       var server1 = new Server(1, [], 'leader',2);
       server1.log = [{"index": 1, "term": 2}];
@@ -196,6 +199,7 @@ describe("Rules for Candidates", function() {
       var result = server1.invokeAppendEntries(server2);
       assert.equal(result.success, false);
     });
+    // Rule 2
     it("reply false if log doesn't contain entry at prevLogIndex whose terms matches prevLogTerm", function() {
       var server1 = new Server(1, [], 'leader',2);
       server1.log = [{"index": 1, "term": 2}];
@@ -204,6 +208,7 @@ describe("Rules for Candidates", function() {
       var result = server1.invokeAppendEntries(server2);
       assert.equal(result.success, false);
     });
+    // Rule 2
     it("reply true if log does contain entry at prevLogIndex whose terms matches prevLogTerm", function() {
       var server1 = new Server(1, [], 'leader');
       server1.log = [{"index": 1, "term": 1}];
@@ -211,6 +216,26 @@ describe("Rules for Candidates", function() {
       server2.log = [{"index": 1, "term": 1}];
       var result = server1.invokeAppendEntries(server2);
       assert.equal(result.success, true);
+    });
+    // Rule 3
+    describe("If an existing entry conflicts with a new one", function() {
+      it("deletes existing entry and all that follows", function() {
+        var server1 = new Server(1, [], 'leader',2);
+        server1.log = [{"index": 1, "term": 1}, {"index": 1, "term": 2}];
+        var server2 = new Server(2, [], 'follower',2);
+        server2.log = [{"index": 1, "term": 1}, {"index": 1, "term": 1}, {"index": 1, "term": 3}];
+        var result = server1.invokeAppendEntries(server2);
+        assert.deepEqual(server2.log, [{"index": 1, "term": 1}]);
+      });
+    });
+    // Rule 4
+    it("appends any new entries not already in the log", function() {
+      var server1 = new Server(1, [], 'leader',2);
+      server1.log = [{"index": 1, "term": 1}, {"index": 1, "term": 2}];
+      var server2 = new Server(2, [], 'follower',2);
+      server2.log = [{"index": 1, "term": 1}];
+      var result = server1.invokeAppendEntries(server2);
+      assert.deepEqual(server2.log, [{"index": 1, "term": 1}]);
     });
   });
 

@@ -108,15 +108,25 @@ Server = (function() {
   Server.prototype.onReceiveAppendEntries = function(sourcePeer, appendEntries) {
     this.onRemoteProcedureCall(appendEntries);
     this.state = "follower";
+    if (!this.containsLogEntryWithSameTerm(appendEntries)) {
+      this.deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex)
+    }
     return sourcePeer.invokeAppendEntriesResponse(
       {"term": this.currentTerm, 
        "success": this.appendEntriesSuccessResult(appendEntries)
       });
   }
 
+  Server.prototype.deleteLogEntriesFollowingAndIncluding = function(logIndex) {
+    this.log.splice(
+      logIndex,
+      this.log.length - logIndex
+    )
+  }
+
   Server.prototype.appendEntriesSuccessResult = function(appendEntries) {
     return !(appendEntries.term < this.currentTerm) &&
-            this.containsLogEntryWithSameTerm(appendEntries)
+            this.containsLogEntryWithSameTerm(appendEntries);
   }
 
   Server.prototype.containsLogEntryWithSameTerm = function(appendEntries) {
