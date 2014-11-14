@@ -1,1 +1,29 @@
-\section{Preface}
+\section{Introduction}
+This the final report for a project done in the course "Fault tolerant systems" 02228. The purpose of this report is to document an implementation of a consensus algorithm i.e. Raft. \\
+Starting, the fundamental problem when talking about consensus in a distributed system, will be presented. This will then present the motivation behind the project itself. As many solutions to this problem already exists, it should also be discussed why Raft in particular is relevant in the context of this project.
+
+\subsection{Problem}
+Reaching consensus in a distributed system means that processes in the network agree on some value of state of the entire system. This is often needed as processes might to be faulty and thus reliability and availability is at stake on single-point-of-failure. Upholding these properties in a given distributed system then relies on the architecture utilised and hardware implemented in the processes. And having system that can tolerate faulty processes by maintaining a common knowledge of a value of state is preferred. A simple solution to this could be to initiate a vote among all correct processes on to what the value is, in which the value is the result of the majority vote. The figure \ref{consensus} below illustrates an example of a distributed system consisting of a number of notes. The value \textit{x} is what the system must agree upon. Though here we have faulty process \textit{P1}, taking the fact of connectivity of system aside, the system will suffer from this because of the know unreliable messages transmitted from this process might override this value at some of the other correct ones. \\
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=0.5\textwidth]{consensus}
+	\caption{A distributed system consisting of a number of nodes with a faulty one.}
+	\label{consensus}
+\end{figure}
+The fundamental problem behind this, is that you cannot rely on the individual process to be reliable and thus solely store the value. This means, that every process should store this value and should be able to be altered somehow. This boils down to a well-known problem - The Two Generals Problem. 
+\subsection{Motivation}
+The elements of the problem presented by this problem serves as motivation behind consensus in a system of unreliable components. Because how do you know for certain what a value is, when you for sure know that some components must be faulty at some point.
+\subsubsection{The Two Generals Problem}
+Agreeing on which state a system, among its processes, is in is a well known problem when talking about distributed systems.
+This can be illustrated by the Two Generals Problem analogy.
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=1\textwidth]{twogenerals}
+	\caption{Two generals tries to agree on when to attack the enemy by sending a messenger, but they are not sure the messenger survives his trip between their camps.}
+	\label{generals}
+\end{figure}
+Here we see two generals of the same army who want to attack an enemy army. But they have to attack at the same time in order to win. They cant communicate directly to each other since they are at different fronts of the battlefield i.e. in the own camps. In the context of a distributed system, the generals here can be seen as two processes trying to agree on a value.
+General 1 then sends out a messenger to tell the second general, that they should attack at dawn. The second general then receives this message, but the first general cannot be sure of this (the messenger might be captured or killed by the 
+enemy on his way to the second general and vice versa). Again, in the context of distributed system, the unreliability of messenger can directly related back to the unreliability of message transmission in a normal distributed system.
+So the second general sends the messenger back in order to acknowledge this. But the first general also has to acknowledge this, resulting in a never ending run for the poor messenger - thus the generals can never agree on when to attack the enemy.
+\subsection{Raft}

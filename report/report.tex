@@ -73,7 +73,6 @@
 %			\vspace{0.3cm}
 		}
 
-\author{Joachim Kirkegaard Friis s093256 \\ Anders Nielsen s103457 \\ \today}
 %}
 
 
@@ -85,14 +84,22 @@
 
 \printtitle									% Print the title data as defined above
   	\vfill
+  	\author{Joachim Kirkegaard Friis s093256 \\ Anders Nielsen s103457 \\ \vspace{0.2cm} \today}
+  		\begin{figure}[h]
+  	  		\centering
+  	  		\includegraphics[width=1\textwidth]{frontpage}
+  	  	\end{figure}
 \printauthor								% Print the author data as defined above
 \newpage
-\bibliography{references.bib}
-\include{preface}
-\include{analysis}
+\tableofcontents
+\include{introduction}
 \include{requirements}
+\include{analysis}
+
 \include{design}
 \include{implementation}
 \include{tests}
 \include{conclusion}
+
+\bibliography{references.bib}
 \end{document}
