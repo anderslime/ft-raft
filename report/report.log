@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.11.8)  15 NOV 2014 12:47
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.11.8)  15 NOV 2014 14:13
 entering extended mode
 **report.tex
 (C:\Users\Joachim\Documents\ft-raft\report\report.tex
@@ -676,7 +676,7 @@ File: ./figures/twogenerals.png Graphic file (type png)
 
 <use ./figures/twogenerals.png>
 Package pdftex.def Info: ./figures/twogenerals.png used on input line 35.
-(pdftex.def)             Requested size: 418.25368pt x 277.97762pt.
+(pdftex.def)             Requested size: 334.60422pt x 222.3788pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
@@ -685,35 +685,45 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 LaTeX Warning: Citation `Raft' on page 5 undefined on input line 45.
 
-) [5 <C:/Users/Joachim/Documents/ft-raft/report/figures/twogenerals.png>]
-(C:\Users\Joachim\Documents\ft-raft\report\requirements.tex
+
+LaTeX Warning: Citation `Paxos' on page 5 undefined on input line 45.
+
+[5 <C:/Users/Joachim/Documents/ft-raft/report/figures/twogenerals.png>]
+Missing character: There is no ‚ in font cmti10!
+Missing character: There is no Ä in font cmti10!
+Missing character: There is no ô in font cmti10!
+
+
+LaTeX Warning: Citation `Raft' on page 6 undefined on input line 49.
+
+) [6] (C:\Users\Joachim\Documents\ft-raft\report\requirements.tex
 Missing character: There is no ‚ in font cmr10!
 Missing character: There is no Ä in font cmr10!
 Missing character: There is no ú in font cmr10!
 Missing character: There is no ‚ in font cmr10!
 Missing character: There is no Ä in font cmr10!
 Missing character: There is no ù in font cmr10!
-) [6
+) [7
 
 
 ]
-(C:\Users\Joachim\Documents\ft-raft\report\analysis.tex) [7
+(C:\Users\Joachim\Documents\ft-raft\report\analysis.tex) [8
 
 
 ]
-(C:\Users\Joachim\Documents\ft-raft\report\design.tex) [8
+(C:\Users\Joachim\Documents\ft-raft\report\design.tex) [9
 
 
 ]
-(C:\Users\Joachim\Documents\ft-raft\report\implementation.tex) [9
+(C:\Users\Joachim\Documents\ft-raft\report\implementation.tex) [10
 
 
 ]
-(C:\Users\Joachim\Documents\ft-raft\report\tests.tex) [10
+(C:\Users\Joachim\Documents\ft-raft\report\tests.tex) [11
 
 
 ]
-(C:\Users\Joachim\Documents\ft-raft\report\conclusion.tex) [11
+(C:\Users\Joachim\Documents\ft-raft\report\conclusion.tex) [12
 
 
 ]
@@ -740,13 +750,13 @@ LaTeX Warning: There were undefined references.
 Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 105.
  ) 
 Here is how much of TeX's memory you used:
- 12957 strings out of 493921
- 200484 string characters out of 3147276
- 385419 words of memory out of 3000000
- 15918 multiletter control sequences out of 15000+200000
- 15762 words of font info for 86 fonts, out of 3000000 for 9000
+ 12969 strings out of 493921
+ 200576 string characters out of 3147276
+ 385420 words of memory out of 3000000
+ 15919 multiletter control sequences out of 15000+200000
+ 16074 words of font info for 91 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 40i,8n,46p,1196b,365s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 40i,8n,46p,1196b,415s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Pr
 ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Fi
 les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><C:/Program Files/MiK
@@ -757,9 +767,9 @@ msfonts/cm/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm
 /cmr9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmssbx10.
 pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/
 Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on report.pdf (11 pages, 452159 bytes).
+Output written on report.pdf (12 pages, 458575 bytes).
 PDF statistics:
- 212 PDF objects out of 1000 (max. 8388607)
- 47 named destinations out of 1000 (max. 500000)
+ 217 PDF objects out of 1000 (max. 8388607)
+ 48 named destinations out of 1000 (max. 500000)
  17032 words of extra memory for PDF output out of 17280 (max. 10000000)
 

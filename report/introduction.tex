@@ -32,14 +32,26 @@ The elements of the problem presented by this problem serves as motivation behin
 The basic problem of reaching consensus in a distributed network can be illustrated by the Two Generals Problem analogy.
 \begin{figure}[h]
 	\centering
-	\includegraphics[width=1\textwidth]{twogenerals}
+	\includegraphics[width=0.8\textwidth]{twogenerals}
 	\caption{Two generals tries to agree on when to attack the enemy by sending a messenger, but they are not sure the messenger survives his trip between their camps.}
 	\label{generals}
 \end{figure}
-Here we see two generals of the same army who want to attack an enemy army. But they have to attack at the same time in order to win. They cant communicate directly to each other since they are at different fronts of the battlefield i.e. in the own camps. In the context of a distributed system, the generals here can be seen as two processes trying to agree on a value.
+In the figure\ref{generals} below we see two generals of the same army who want to attack an enemy army. But they have to attack at the same time in order to win. They cant communicate directly to each other since they are at different fronts of the battlefield i.e. in the own camps. In the context of a distributed system, the generals here can be seen as two processes trying to agree on a value.
 General 1 then sends out a messenger to tell the second general, that they should attack at dawn. The second general then receives this message, but the first general cannot be sure of this (the messenger might be captured or killed by the 
 enemy on his way to the second general and vice versa). Again, in the context of distributed system, the unreliability of messenger can directly related back to the unreliability of message transmission in a normal distributed system.
 So the second general sends the messenger back in order to acknowledge this. But the first general also has to acknowledge this, resulting in a never ending run for the poor messenger - thus the generals can never agree on when to attack the enemy.
 
 \subsection{Raft}
-As of writing this report, the most recent proposal to solving the consensus problem is Raft \cite{Raft}.
+As of writing this report, the most recent proposal to solving the consensus problem is Raft \cite{Raft}. Diego Ongaro and John Oustershout argue that most consensus algorithms, such as Paxos \cite{Paxos} suffer from poor understandability and thus are hard to teach and later implement. Raft is composed with three main components:
+\begin{itemize}
+\item \textbf{Strong leader}: \textit{Raft uses a stronger form of leadership than other consensus algorithms. For example, log entries only flow from the leader to other servers. This simplifies the management of the replicated log and makes Raft easier to understand.}
+\item \textbf{Leader election}: \textit{Raft uses randomized timers to elect leaders. This adds only a small amount of mechanism to the heartbeats already required for any consensus algorithm, while resolving conflicts simply and rapidly.}
+\item \textbf{Membership changes}: \textit{Raft’s mechanism for changing the set of servers in the cluster uses a new joint consensus approach where the majorities of two different configurations overlap during transitions. This allows the cluster to continue operating normally during configuration changes.} \cite{Raft}
+\end{itemize}
+Below is a description of the terms they use in this case:
+\begin{itemize}
+\item Log entries: A list of values that should be the same among all processes in the network.
+\item Log replication: A client pushes a new value to the network to the leader, which then replicates this to the rest of the network.
+\item Server: A process in the network.
+\item Heart beat: An empty message repeatedly send to all the followers of the leader, in order to maintain a knowledge of failed process.
+\end{itemize}
