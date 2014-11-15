@@ -10,12 +10,26 @@ Reaching consensus in a distributed system means that processes in the network a
 	\caption{A distributed system consisting of a number of nodes with a faulty one.}
 	\label{consensus}
 \end{figure}
-The fundamental problem behind this, is that you cannot rely on the individual process to be reliable and thus solely store the value. This means, that every process should store this value and should be able to be altered somehow. This boils down to a well-known problem - The Two Generals Problem. 
+The fundamental problem behind this, is that you cannot rely on the individual process to be reliable and thus solely store the value. This means, that every process should store this value and should be able to be altered somehow. This boils down to a well-known problem - The Two Generals Problem.
+\subsubsection{Properties of distributed consensus}
+When talking about consensus, the goal is to satisfy a set of requirements i.e. properties that the distributed system must uphold. These properties are used to describe the systems fault tolerant features related to faulty processes. A faulty process can either fail by crashing or experience a Byzantine failure. Such a failure in the context of distributes system occur when e.g. a process for some reason transmits incorrect or malicious data throughout the network. Due to the arbitrary results of these kinds failures, properties of a system are often distinguished by either tolerating them or not. A main difference in terms of properties of system, if it tolerates Byzantine failures, is the validity and integrity. The integrity property for a system that does not tolerate it is as following\footnote{http://en.wikipedia.org/wiki/Consensus\_(computer\_science)}:
+\begin{itemize}
+\item non-Byzantine failure tolerant:
+	\begin{itemize}
+	\item \textbf{Validity}: If all processes propose the same value \textit{v}, then all correct processes decide \textit{v}.
+	\item \textbf{Integrity}: Every correct process decides at most one value, and if it decides some value \textit{v}, then \textit{v} must have been proposed by some process.
+	\end{itemize}
+\item Byzantine failure tolerant:
+	\begin{itemize}
+	\item \textbf{Validity}: If all correct processes propose the same value \textit{v}, then all correct processes decide \textit{v}.
+	\item \textbf{Integrity}: If a correct process decides \textit{v}, then \textit{v} must have been proposed by some correct process.
+	\end{itemize}
+\end{itemize}
+The clearest commonality here, is that you should always be able to say that all correct processes must be able to decide on the same value or state, as mentioned earlier. Though the main difference is that with Byzantine processes, you must be able to say if they are all correct before stating they can derive the same value. This fact differentiates many solutions to this problem, whether on which property set that can achieve to satisfy.
 \subsection{Motivation}
 The elements of the problem presented by this problem serves as motivation behind consensus in a system of unreliable components. Because how do you know for certain what a value is, when you for sure know that some components must be faulty at some point.
 \subsubsection{The Two Generals Problem}
-Agreeing on which state a system, among its processes, is in is a well known problem when talking about distributed systems.
-This can be illustrated by the Two Generals Problem analogy.
+The basic problem of reaching consensus in a distributed network can be illustrated by the Two Generals Problem analogy.
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=1\textwidth]{twogenerals}
@@ -26,4 +40,6 @@ Here we see two generals of the same army who want to attack an enemy army. But 
 General 1 then sends out a messenger to tell the second general, that they should attack at dawn. The second general then receives this message, but the first general cannot be sure of this (the messenger might be captured or killed by the 
 enemy on his way to the second general and vice versa). Again, in the context of distributed system, the unreliability of messenger can directly related back to the unreliability of message transmission in a normal distributed system.
 So the second general sends the messenger back in order to acknowledge this. But the first general also has to acknowledge this, resulting in a never ending run for the poor messenger - thus the generals can never agree on when to attack the enemy.
+
 \subsection{Raft}
+As of writing this report, the most recent proposal to solving the consensus problem is Raft \cite{Raft}.
