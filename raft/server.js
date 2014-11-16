@@ -12,10 +12,6 @@ Server = (function() {
     this.votedFor = null;
   };
 
-  Server.prototype.becomeLeader = function() {
-    this.state = 'leader';
-  };
-
   Server.prototype.onReceiveRequest = function(logEntry) {
     if (this.isLeader()) {
       this.log.append({"index": logEntry.index, "term": this.currentTerm})
@@ -67,7 +63,7 @@ Server = (function() {
       return voteResponse.voteGranted;
     });
     if (this.hasGrantedMajorityOfVotes(positiveVotes)) {
-      this.becomeLeader();
+      this._becomeLeader();
     }
   }
 
@@ -188,6 +184,10 @@ Server = (function() {
     var totalVotes = positiveVotes.length + serversOwnVote;
     return this.cluster.isLargerThanMajority(totalVotes);
   }
+
+  Server.prototype._becomeLeader = function() {
+    this.state = 'leader';
+  };
 
   return Server;
 
