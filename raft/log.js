@@ -28,6 +28,11 @@ Log = (function() {
     return this.logEntries.length;
   }
 
+  Log.prototype.lastLogTerm = function() {
+    if (this.logEntries.length === 0) return 0;
+    return this.lastEntry().term;
+  }
+
   return Log;
 })();
 

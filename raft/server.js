@@ -181,11 +181,7 @@ Server = (function() {
   }
 
   Server.prototype.lastLogTerm = function() {
-    if (this.log.length() === 0) {
-      return 0;
-    } else {
-      return this.lastLogEntry().term;
-    }
+    return this.log.lastLogTerm();
   }
 
   Server.prototype.hasGrantedMajorityOfVotes = function(positiveVotes) {
