@@ -1,5 +1,6 @@
 var assert = require('chai').assert;
 var Server = require('../raft/server');
+var Log = require('../raft/log');
 
 updatePeers = function(servers) {
   for (serverId in servers) {
@@ -103,9 +104,9 @@ describe("Rules for Candidates", function() {
       // set currentTerm = T, convert to follower
       it("is not granted a vote when the candidate log is not up to date", function() {
         var server1 = new Server(1, [], 'candidate', 2);
-        server1.log = [{"index": 1, "term": 1}];
+        server1.log = new Log([{"index": 1, "term": 1}]);
         var server2 = new Server(2, [], 'follower', 2);
-        server2.log = [{"index": 1, "term": 1}, {"index": 5, "term": 2}];
+        server2.log = new Log([{"index": 1, "term": 1}, {"index": 5, "term": 2}]);
         var voteResponse = server1.invokeVoteRequest(server2);
         assert.equal(voteResponse.voteGranted, false);
       });
@@ -194,7 +195,7 @@ describe("Rules for Candidates", function() {
     // Rule 2
     it("reply false if log doesn't contain entry at prevLogIndex", function() {
       var server1 = new Server(1, [], 'leader',2);
-      server1.log = [{"index": 1, "term": 2}];
+      server1.log = new Log([{"index": 1, "term": 2}]);
       var server2 = new Server(2, [], 'follower',2);
       var result = server1.invokeAppendEntries(server2);
       assert.equal(result.success, false);
@@ -202,18 +203,18 @@ describe("Rules for Candidates", function() {
     // Rule 2
     it("reply false if log doesn't contain entry at prevLogIndex whose terms matches prevLogTerm", function() {
       var server1 = new Server(1, [], 'leader',2);
-      server1.log = [{"index": 1, "term": 2}];
+      server1.log = new Log([{"index": 1, "term": 2}]);
       var server2 = new Server(2, [], 'follower',2);
-      server2.log = [{"index": 1, "term": 1}];
+      server2.log = new Log([{"index": 1, "term": 1}]);
       var result = server1.invokeAppendEntries(server2);
       assert.equal(result.success, false);
     });
     // Rule 2
     it("reply true if log does contain entry at prevLogIndex whose terms matches prevLogTerm", function() {
       var server1 = new Server(1, [], 'leader');
-      server1.log = [{"index": 1, "term": 1}];
+      server1.log = new Log([{"index": 1, "term": 1}]);
       var server2 = new Server(2, [], 'follower');
-      server2.log = [{"index": 1, "term": 1}];
+      server2.log = new Log([{"index": 1, "term": 1}]);
       var result = server1.invokeAppendEntries(server2);
       assert.equal(result.success, true);
     });
@@ -221,21 +222,21 @@ describe("Rules for Candidates", function() {
     describe("If an existing entry conflicts with a new one", function() {
       it("deletes existing entry and all that follows", function() {
         var server1 = new Server(1, [], 'leader',2);
-        server1.log = [{"index": 1, "term": 1}, {"index": 1, "term": 2}];
+        server1.log = new Log([{"index": 1, "term": 1}, {"index": 1, "term": 2}]);
         var server2 = new Server(2, [], 'follower',2);
-        server2.log = [{"index": 1, "term": 1}, {"index": 1, "term": 1}, {"index": 1, "term": 3}];
+        server2.log = new Log([{"index": 1, "term": 1}, {"index": 1, "term": 1}, {"index": 1, "term": 3}]);
         var result = server1.invokeAppendEntries(server2);
-        assert.deepEqual(server2.log, [{"index": 1, "term": 1}]);
+        assert.deepEqual(server2.log.logEntries, [{"index": 1, "term": 1}]);
       });
     });
     // Rule 4
     it("appends any new entries not already in the log", function() {
       var server1 = new Server(1, [], 'leader',2);
-      server1.log = [{"index": 1, "term": 1}, {"index": 1, "term": 2}];
+      server1.log = new Log([{"index": 1, "term": 1}, {"index": 1, "term": 2}]);
       var server2 = new Server(2, [], 'follower',2);
-      server2.log = [{"index": 1, "term": 1}];
+      server2.log = new Log([{"index": 1, "term": 1}]);
       var result = server1.invokeAppendEntries(server2);
-      assert.deepEqual(server2.log, [{"index": 1, "term": 1}]);
+      assert.deepEqual(server2.log.logEntries, [{"index": 1, "term": 1}]);
     });
   });
 
@@ -251,7 +252,7 @@ describe("Client Log Entry Request", function() {
     var server = new Server(1, [], 'leader');
     var logEntry = {"index": 1};
     var response = server.onReceiveRequest(logEntry);
-    assert.equal(server.log.length, 1);
+    assert.equal(server.log.length(), 1);
     assert.equal(server.lastLogEntry().index, 1);
     assert.equal(server.lastLogEntry().term, 0);
     assert.equal(response.isSuccessful, true);
@@ -266,6 +267,6 @@ describe("Client Log Entry Request", function() {
     var response = server1.onReceiveRequest(1);
     assert.equal(response.isSuccessful, false);
     assert.equal(response.leaderId, 2);
-    assert.equal(server1.log.length, 0);
+    assert.equal(server1.log.length(), 0);
   });
 });

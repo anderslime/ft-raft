@@ -1,9 +1,11 @@
+var Log = require('./log');
+
 Server = (function() {
   function Server(id, peers, state, currentTerm) {
     this.id = id;
     this.peers = peers;
     this.state = state || 'follower';
-    this.log = [];
+    this.log = new Log();
     this.currentTerm = currentTerm || 0;
     this.votedFor = null;
   };
@@ -14,7 +16,7 @@ Server = (function() {
 
   Server.prototype.onReceiveRequest = function(logEntry) {
     if (this.isLeader()) {
-      this.log.push({"index": logEntry.index, "term": this.currentTerm});
+      this.log.append({"index": logEntry.index, "term": this.currentTerm})
       return {
         "isSuccessful": true,
         "leaderId": this.id
@@ -28,7 +30,7 @@ Server = (function() {
   };
 
   Server.prototype.lastLogEntry = function() {
-    return this.log[this.lastLogIndex()];
+    return this.log.lastEntry();
   };
 
   Server.prototype.addPeer = function(server){
@@ -90,8 +92,7 @@ Server = (function() {
   }
 
   Server.prototype.lastLogIndex = function() {
-    if (this.log.length === 0) return null;
-    return this.log.length - 1;
+    return this.log.lastIndex();
   }
 
   Server.prototype.onReceiveRequestVote = function(sourcePeer, requestVote) {
@@ -112,16 +113,13 @@ Server = (function() {
       this.deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex)
     }
     return sourcePeer.invokeAppendEntriesResponse(
-      {"term": this.currentTerm, 
+      {"term": this.currentTerm,
        "success": this.appendEntriesSuccessResult(appendEntries)
       });
   }
 
   Server.prototype.deleteLogEntriesFollowingAndIncluding = function(logIndex) {
-    this.log.splice(
-      logIndex,
-      this.log.length - logIndex
-    )
+    this.log.deleteLogEntriesFollowingAndIncluding(logIndex);
   }
 
   Server.prototype.appendEntriesSuccessResult = function(appendEntries) {
@@ -131,8 +129,8 @@ Server = (function() {
 
   Server.prototype.containsLogEntryWithSameTerm = function(appendEntries) {
     return (appendEntries.prevLogIndex === null) ||
-           (this.log[appendEntries.prevLogIndex] !== undefined &&
-           this.log[appendEntries.prevLogIndex].term === appendEntries.prevLogTerm);
+           (this.log.entryAt(appendEntries.prevLogIndex) !== undefined &&
+            this.log.entryAt(appendEntries.prevLogIndex).term === appendEntries.prevLogTerm);
   }
 
 
@@ -180,7 +178,7 @@ Server = (function() {
   }
 
   Server.prototype.lastLogTerm = function() {
-    if (this.log.length === 0) {
+    if (this.log.length() === 0) {
       return 0;
     } else {
       return this.lastLogEntry().term;
