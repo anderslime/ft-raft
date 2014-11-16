@@ -173,11 +173,14 @@ Server = (function() {
   Server.prototype.isValidVote = function(requestVote) {
     return requestVote.term >= this.currentTerm &&
       (this.votedFor === null || this.votedFor === requestVote.candidateId) &&
-      this.isRequestLogAtLeastUpdToDate(requestVote.lastLogIndex, requestVote.lastLogTerm);
+      this.isLogAtLeastUpToDateAsRequestVote(requestVote);
   }
 
-  Server.prototype.isRequestLogAtLeastUpdToDate = function(logIndex, logTerm) {
-    return this.lastLogIndex() <= logIndex && this.lastLogTerm() <= logTerm;
+  Server.prototype.isLogAtLeastUpToDateAsRequestVote = function(requestVote) {
+    return this.log.isAtLeastUpToDateAs(
+      requestVote.lastLogIndex,
+      requestVote.lastLogTerm
+    )
   }
 
   Server.prototype.lastLogTerm = function() {
