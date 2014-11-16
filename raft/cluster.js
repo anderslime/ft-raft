@@ -7,6 +7,11 @@ Cluster = (function() {
     this.peers.push(server);
   }
 
+  Cluster.prototype.leaderId = function() {
+    var leader = this.leader();
+    return leader && leader.id;
+  }
+
   Cluster.prototype.leader = function() {
     var leader = {};
     for (peerIndex in this.peers) {

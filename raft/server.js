@@ -26,7 +26,7 @@ Server = (function() {
     } else {
       return {
         "isSuccessful": false,
-        "leaderId": this.findLeader().id
+        "leaderId": this.cluster.leaderId()
       }
     }
   };
@@ -41,10 +41,6 @@ Server = (function() {
 
   Server.prototype.isLeader = function() {
     return this.state == 'leader';
-  }
-
-  Server.prototype.findLeader = function() {
-    return this.cluster.leader();
   }
 
   Server.prototype.onTimeout = function(withElection){
