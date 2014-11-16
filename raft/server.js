@@ -1,9 +1,11 @@
 var Log = require('./log');
+var Cluster = require('./cluster');
 
 Server = (function() {
   function Server(id, peers, state, currentTerm) {
     this.id = id;
     this.peers = peers;
+    this.cluster = new Cluster(peers.concat(this));
     this.state = state || 'follower';
     this.log = new Log();
     this.currentTerm = currentTerm || 0;
@@ -34,7 +36,7 @@ Server = (function() {
   };
 
   Server.prototype.addPeer = function(server){
-    this.peers.push(server);
+    this.cluster.addPeer(server);
   };
 
   Server.prototype.isLeader = function() {
@@ -42,14 +44,7 @@ Server = (function() {
   }
 
   Server.prototype.findLeader = function() {
-    var leader = {};
-    for (peerIndex in this.peers) {
-      var peer = this.peers[peerIndex];
-      if (peer.isLeader()) {
-        leader = peer;
-      }
-    }
-    return leader;
+    return this.cluster.leader();
   }
 
   Server.prototype.onTimeout = function(withElection){
@@ -64,8 +59,11 @@ Server = (function() {
     this.currentTerm += 1;
     this.votedFor = this.id;
     var voteResponses = [];
-    for (peerIndex in this.peers) {
-      voteResponses.push(this.invokeVoteRequest(this.peers[peerIndex]))
+    for (peerIndex in this.cluster.peers) {
+      var peer = this.cluster.peers[peerIndex];
+      if (peer.id !== this.id) {
+        voteResponses.push(this.invokeVoteRequest(peer))
+      }
     }
     this.becomeLeaderIfMajorityOfVotesReceived(voteResponses);
   }
@@ -186,24 +184,9 @@ Server = (function() {
   }
 
   Server.prototype.hasGrantedMajorityOfVotes = function(positiveVotes) {
-    serversOwnVote = (this.votedFor == this.id) ? 1 : 0
-    return positiveVotes.length + serversOwnVote >= this.peerMajoritySize()
-  }
-
-  Server.prototype.peerMajoritySize = function() {
-    if (this.hasEventNumberOfPeersInNetwork()) {
-      return this.networkPeerSize() / 2 + 1
-    } else {
-      return Math.ceil(this.networkPeerSize())
-    }
-  }
-
-  Server.prototype.hasEventNumberOfPeersInNetwork = function() {
-    return this.networkPeerSize() % 2 == 0;
-  }
-
-  Server.prototype.networkPeerSize = function() {
-    return this.peers.length + 1;
+    serversOwnVote = (this.votedFor == this.id) ? 1 : 0;
+    var totalVotes = positiveVotes.length + serversOwnVote;
+    return this.cluster.isLargerThanMajority(totalVotes);
   }
 
   return Server;
