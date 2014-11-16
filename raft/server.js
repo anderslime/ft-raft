@@ -46,36 +46,16 @@ Server = (function() {
     }
   }
 
-  Server.prototype.becomeLeaderIfMajorityOfVotesReceived = function(voteResponses) {
-    positiveVotes = voteResponses.filter(function(voteResponse) {
-      return voteResponse.voteGranted;
-    });
-    if (this._hasGrantedMajorityOfVotes(positiveVotes)) {
-      this._becomeLeader();
-    }
-  }
-
-  Server.prototype.otherPeers = function() {
-    var _me = this;
-    return this.cluster.peers.filter(function(peer) {
-      return peer.id !== _me.id;
-    });
-  }
-
   Server.prototype.invokeVoteRequest = function(targetPeer) {
     return targetPeer.onReceiveRequestVote(
       this,
       {
         "term": this.currentTerm,
         "candidateId": this.id,
-        "lastLogIndex": this.lastLogIndex(),
+        "lastLogIndex": this._lastLogIndex(),
         "lastLogTerm": this._lastLogTerm()
       }
     )
-  }
-
-  Server.prototype.lastLogIndex = function() {
-    return this.log.lastIndex();
   }
 
   Server.prototype.onReceiveRequestVote = function(sourcePeer, requestVote) {
@@ -93,16 +73,12 @@ Server = (function() {
     this._onRemoteProcedureCall(appendEntries);
     this.state = "follower";
     if (!this.containsLogEntryWithSameTerm(appendEntries)) {
-      this.deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex)
+      this._deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex)
     }
     return sourcePeer.invokeAppendEntriesResponse(
       {"term": this.currentTerm,
        "success": this.appendEntriesSuccessResult(appendEntries)
       });
-  }
-
-  Server.prototype.deleteLogEntriesFollowingAndIncluding = function(logIndex) {
-    this.log.deleteLogEntriesFollowingAndIncluding(logIndex);
   }
 
   Server.prototype.appendEntriesSuccessResult = function(appendEntries) {
@@ -133,12 +109,20 @@ Server = (function() {
       {
         "term": this.currentTerm,
         "leaderId": this.id,
-        "prevLogIndex": this.lastLogIndex(),
+        "prevLogIndex": this._lastLogIndex(),
         "prevLogTerm": this._lastLogTerm(),
         "entries": [],
         "leaderCommit": null
       }
     )
+  }
+
+  Server.prototype._lastLogIndex = function() {
+    return this.log.lastIndex();
+  }
+
+  Server.prototype._deleteLogEntriesFollowingAndIncluding = function(logIndex) {
+    this.log.deleteLogEntriesFollowingAndIncluding(logIndex);
   }
 
   // Rules for Servers: If RPC request or response contains term T > currentTerm:
@@ -178,13 +162,29 @@ Server = (function() {
     this.votedFor = this.id;
     var _me = this;
     var voteResponses = this._collectVotesFromOtherPeers();
-    this.becomeLeaderIfMajorityOfVotesReceived(voteResponses);
+    this._becomeLeaderIfMajorityOfVotesReceived(voteResponses);
+  }
+
+  Server.prototype._becomeLeaderIfMajorityOfVotesReceived = function(voteResponses) {
+    positiveVotes = voteResponses.filter(function(voteResponse) {
+      return voteResponse.voteGranted;
+    });
+    if (this._hasGrantedMajorityOfVotes(positiveVotes)) {
+      this._becomeLeader();
+    }
   }
 
   Server.prototype._collectVotesFromOtherPeers = function() {
     var _me = this;
-    return this.otherPeers().map(function(peer) {
+    return this._otherPeers().map(function(peer) {
       return _me.invokeVoteRequest(peer);
+    });
+  }
+
+  Server.prototype._otherPeers = function() {
+    var _me = this;
+    return this.cluster.peers.filter(function(peer) {
+      return peer.id !== _me.id;
     });
   }
 
