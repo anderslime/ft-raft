@@ -4,7 +4,6 @@ var Cluster = require('./cluster');
 Server = (function() {
   function Server(id, peers, state, currentTerm) {
     this.id = id;
-    this.peers = peers;
     this.cluster = new Cluster(peers.concat(this));
     this.state = state || 'follower';
     this.log = new Log();
