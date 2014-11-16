@@ -42,23 +42,15 @@ Server = (function() {
     if (withElection === undefined) withElection = true;
     this.state = "candidate";
     if (withElection) {
-      this.startElection()
+      this._startElection()
     }
-  };
-
-  Server.prototype.startElection = function() {
-    this.currentTerm += 1;
-    this.votedFor = this.id;
-    var _me = this;
-    var voteResponses = this._collectVotesFromOtherPeers();
-    this.becomeLeaderIfMajorityOfVotesReceived(voteResponses);
   }
 
   Server.prototype.becomeLeaderIfMajorityOfVotesReceived = function(voteResponses) {
     positiveVotes = voteResponses.filter(function(voteResponse) {
       return voteResponse.voteGranted;
     });
-    if (this.hasGrantedMajorityOfVotes(positiveVotes)) {
+    if (this._hasGrantedMajorityOfVotes(positiveVotes)) {
       this._becomeLeader();
     }
   }
@@ -77,7 +69,7 @@ Server = (function() {
         "term": this.currentTerm,
         "candidateId": this.id,
         "lastLogIndex": this.lastLogIndex(),
-        "lastLogTerm": this.lastLogTerm()
+        "lastLogTerm": this._lastLogTerm()
       }
     )
   }
@@ -142,7 +134,7 @@ Server = (function() {
         "term": this.currentTerm,
         "leaderId": this.id,
         "prevLogIndex": this.lastLogIndex(),
-        "prevLogTerm": this.lastLogTerm(),
+        "prevLogTerm": this._lastLogTerm(),
         "entries": [],
         "leaderCommit": null
       }
@@ -171,14 +163,22 @@ Server = (function() {
     )
   }
 
-  Server.prototype.lastLogTerm = function() {
+  Server.prototype._lastLogTerm = function() {
     return this.log.lastLogTerm();
   }
 
-  Server.prototype.hasGrantedMajorityOfVotes = function(positiveVotes) {
+  Server.prototype._hasGrantedMajorityOfVotes = function(positiveVotes) {
     serversOwnVote = (this.votedFor == this.id) ? 1 : 0;
     var totalVotes = positiveVotes.length + serversOwnVote;
     return this.cluster.isLargerThanMajority(totalVotes);
+  }
+
+  Server.prototype._startElection = function() {
+    this.currentTerm += 1;
+    this.votedFor = this.id;
+    var _me = this;
+    var voteResponses = this._collectVotesFromOtherPeers();
+    this.becomeLeaderIfMajorityOfVotesReceived(voteResponses);
   }
 
   Server.prototype._collectVotesFromOtherPeers = function() {
