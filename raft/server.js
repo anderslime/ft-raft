@@ -79,9 +79,9 @@ Server = (function() {
   }
 
   Server.prototype.onReceiveRequestVote = function(sourcePeer, requestVote) {
-    this.onRemoteProcedureCall(requestVote);
+    this._onRemoteProcedureCall(requestVote);
 
-    if (this.isValidVote(requestVote)) {
+    if (this._isValidVote(requestVote)) {
       this.votedFor = requestVote.candidateId;
       return sourcePeer.invokeVoteResponse({ "term": requestVote.term, "voteGranted": true })
     } else {
@@ -90,7 +90,7 @@ Server = (function() {
   }
 
   Server.prototype.onReceiveAppendEntries = function(sourcePeer, appendEntries) {
-    this.onRemoteProcedureCall(appendEntries);
+    this._onRemoteProcedureCall(appendEntries);
     this.state = "follower";
     if (!this.containsLogEntryWithSameTerm(appendEntries)) {
       this.deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex)
@@ -118,12 +118,12 @@ Server = (function() {
 
 
   Server.prototype.invokeVoteResponse = function(requestVoteResult) {
-    this.onRemoteProcedureCall(requestVoteResult);
+    this._onRemoteProcedureCall(requestVoteResult);
     return requestVoteResult;
   }
 
   Server.prototype.invokeAppendEntriesResponse = function(appendEntriesResult) {
-    this.onRemoteProcedureCall(appendEntriesResult);
+    this._onRemoteProcedureCall(appendEntriesResult);
     return appendEntriesResult;
   }
 
@@ -143,20 +143,20 @@ Server = (function() {
 
   // Rules for Servers: If RPC request or response contains term T > currentTerm:
   // set currentTerm = T, convert to follower
-  Server.prototype.onRemoteProcedureCall = function(rpc) {
+  Server.prototype._onRemoteProcedureCall = function(rpc) {
     if (rpc.term > this.currentTerm) {
       this.currentTerm = rpc.term;
       this.state = 'follower';
     }
   }
 
-  Server.prototype.isValidVote = function(requestVote) {
+  Server.prototype._isValidVote = function(requestVote) {
     return requestVote.term >= this.currentTerm &&
       (this.votedFor === null || this.votedFor === requestVote.candidateId) &&
-      this.isLogAtLeastUpToDateAsRequestVote(requestVote);
+      this._isLogAtLeastUpToDateAsRequestVote(requestVote);
   }
 
-  Server.prototype.isLogAtLeastUpToDateAsRequestVote = function(requestVote) {
+  Server.prototype._isLogAtLeastUpToDateAsRequestVote = function(requestVote) {
     return this.log.isAtLeastUpToDateAs(
       requestVote.lastLogIndex,
       requestVote.lastLogTerm
