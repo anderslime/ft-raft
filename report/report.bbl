@@ -1,0 +1,15 @@
+\begin{thebibliography}{1}
+
+\bibitem{Paxos}
+Leslie Lamport.
+\newblock The part-time parliament.
+\newblock {\em ACM Trans. Comput. Syst.}, 16(2):133--169, May 1998.
+
+\bibitem{Raft}
+Diego Ongaro and John Ousterhout.
+\newblock In search of an understandable consensus algorithm.
+\newblock In {\em Proceedings of the 2014 USENIX Conference on USENIX Annual
+  Technical Conference}, USENIX ATC'14, pages 305--320, Berkeley, CA, USA,
+  2014. USENIX Association.
+
+\end{thebibliography}

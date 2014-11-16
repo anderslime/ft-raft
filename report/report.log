@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.11.8)  15 NOV 2014 14:13
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.11.8)  16 NOV 2014 11:44
 entering extended mode
 **report.tex
 (C:\Users\Joachim\Documents\ft-raft\report\report.tex
@@ -671,39 +671,15 @@ File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10.95> not available
 (Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 17.
 
-<./figures/twogenerals.png, id=107, 811.03pt x 539.01375pt>
+<./figures/twogenerals.png, id=108, 811.03pt x 539.01375pt>
 File: ./figures/twogenerals.png Graphic file (type png)
 
 <use ./figures/twogenerals.png>
-Package pdftex.def Info: ./figures/twogenerals.png used on input line 35.
+Package pdftex.def Info: ./figures/twogenerals.png used on input line 36.
 (pdftex.def)             Requested size: 334.60422pt x 222.3788pt.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-[4]
-
-LaTeX Warning: Citation `Raft' on page 5 undefined on input line 45.
-
-
-LaTeX Warning: Citation `Paxos' on page 5 undefined on input line 45.
-
-[5 <C:/Users/Joachim/Documents/ft-raft/report/figures/twogenerals.png>]
-Missing character: There is no ‚ in font cmti10!
-Missing character: There is no Ä in font cmti10!
-Missing character: There is no ô in font cmti10!
-
-
-LaTeX Warning: Citation `Raft' on page 6 undefined on input line 49.
-
-) [6] (C:\Users\Joachim\Documents\ft-raft\report\requirements.tex
-Missing character: There is no ‚ in font cmr10!
-Missing character: There is no Ä in font cmr10!
-Missing character: There is no ú in font cmr10!
-Missing character: There is no ‚ in font cmr10!
-Missing character: There is no Ä in font cmr10!
-Missing character: There is no ù in font cmr10!
-) [7
+ [4] [5 <C:/Users/Joachim/Documents/ft-raft/report/figures/twogenerals.png>]) [
+6]
+(C:\Users\Joachim\Documents\ft-raft\report\requirements.tex) [7
 
 
 ]
@@ -728,8 +704,11 @@ Missing character: There is no ù in font cmr10!
 
 ]
 (C:\Users\Joachim\Documents\ft-raft\report\report.bbl)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 105.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 105.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 106.
+ [13
+
+]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 106.
 
 (C:\Users\Joachim\Documents\ft-raft\report\report.aux
 (C:\Users\Joachim\Documents\ft-raft\report\introduction.aux)
@@ -739,37 +718,34 @@ Package atveryend Info: Empty hook `AfterLastShipout' on input line 105.
 (C:\Users\Joachim\Documents\ft-raft\report\implementation.aux)
 (C:\Users\Joachim\Documents\ft-raft\report\tests.aux)
 (C:\Users\Joachim\Documents\ft-raft\report\conclusion.aux))
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 105.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 105.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 106.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 106.
 Package rerunfilecheck Info: File `report.out' has not changed.
 (rerunfilecheck)             Checksum: 88EF68E39783D78C9544BE5A464CD659;924.
-
-
-LaTeX Warning: There were undefined references.
-
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 105.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 106.
  ) 
 Here is how much of TeX's memory you used:
- 12969 strings out of 493921
- 200576 string characters out of 3147276
- 385420 words of memory out of 3000000
+ 12975 strings out of 493921
+ 200622 string characters out of 3147276
+ 385473 words of memory out of 3000000
  15919 multiletter control sequences out of 15000+200000
- 16074 words of font info for 91 fonts, out of 3000000 for 9000
+ 16068 words of font info for 92 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
- 40i,8n,46p,1196b,415s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 40i,8n,46p,1196b,409s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx10.pfb><C:/Pr
 ogram Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmbx12.pfb><C:/Program Fi
 les/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmcsc10.pfb><C:/Program Files/MiK
-TeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/f
-onts/type1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type
-1/public/amsfonts/cm/cmr6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/a
-msfonts/cm/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm
-/cmr9.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmssbx10.
-pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/
-Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb>
-Output written on report.pdf (12 pages, 458575 bytes).
+TeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Program Files/MiKTeX 2.9/
+fonts/type1/public/amsfonts/cm/cmr10.pfb><C:/Program Files/MiKTeX 2.9/fonts/typ
+e1/public/amsfonts/cm/cmr12.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public
+/amsfonts/cm/cmr6.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/
+cm/cmr8.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr9.pf
+b><C:/Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmssbx10.pfb><C:/
+Program Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Program 
+Files/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb>
+Output written on report.pdf (13 pages, 470402 bytes).
 PDF statistics:
- 217 PDF objects out of 1000 (max. 8388607)
- 48 named destinations out of 1000 (max. 500000)
+ 235 PDF objects out of 1000 (max. 8388607)
+ 52 named destinations out of 1000 (max. 500000)
  17032 words of extra memory for PDF output out of 17280 (max. 10000000)
 

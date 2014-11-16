@@ -25,7 +25,8 @@ When talking about consensus, the goal is to satisfy a set of requirements i.e. 
 	\item \textbf{Integrity}: If a correct process decides \textit{v}, then \textit{v} must have been proposed by some correct process.
 	\end{itemize}
 \end{itemize}
-The clearest commonality here, is that you should always be able to say that all correct processes must be able to decide on the same value or state, as mentioned earlier. Though the main difference is that with Byzantine processes, you must be able to say if they are all correct before stating they can derive the same value. This fact differentiates many solutions to this problem, whether on which property set that can achieve to satisfy.
+The clearest commonality here, is that you should always be able to say that all correct processes must be able to decide on the same value or state, as mentioned earlier. Though the main difference is that with Byzantine processes, you must be able to say if they are all correct before stating they can derive the same value. This fact differentiates many solutions to this problem, whether on which property set that can achieve to satisfy. \\
+Also, as discussed in \cite{Raft} a consensus algorithm for a non-Byzantine system has the following properties: safety, availability, timing interdependency, and majority vote on procedure calls. The safety property can be directly related back to our validity and integrity properties, as the system's safety and availability is measured be the correctness of return result upon a request.
 \subsection{Motivation}
 The elements of the problem presented by this problem serves as motivation behind consensus in a system of unreliable components. Because how do you know for certain what a value is, when you for sure know that some components must be faulty at some point.
 \subsubsection{The Two Generals Problem}
@@ -42,16 +43,11 @@ enemy on his way to the second general and vice versa). Again, in the context of
 So the second general sends the messenger back in order to acknowledge this. But the first general also has to acknowledge this, resulting in a never ending run for the poor messenger - thus the generals can never agree on when to attack the enemy.
 
 \subsection{Raft}
-As of writing this report, the most recent proposal to solving the consensus problem is Raft \cite{Raft}. Diego Ongaro and John Oustershout argue that most consensus algorithms, such as Paxos \cite{Paxos} suffer from poor understandability and thus are hard to teach and later implement. Raft is composed with three main components:
+As of writing this report, the most recent proposal to solving the consensus problem is Raft \cite{Raft}. Diego Ongaro and John Oustershout argue that most consensus algorithms, such as Paxos \cite{Paxos} suffer from poor understandability and thus are hard to teach and later implement. Raft is is constructed by solving these three fundamental problems:
 \begin{itemize}
-\item \textbf{Strong leader}: \textit{Raft uses a stronger form of leadership than other consensus algorithms. For example, log entries only flow from the leader to other servers. This simplifies the management of the replicated log and makes Raft easier to understand.}
-\item \textbf{Leader election}: \textit{Raft uses randomized timers to elect leaders. This adds only a small amount of mechanism to the heartbeats already required for any consensus algorithm, while resolving conflicts simply and rapidly.}
-\item \textbf{Membership changes}: \textit{Raft’s mechanism for changing the set of servers in the cluster uses a new joint consensus approach where the majorities of two different configurations overlap during transitions. This allows the cluster to continue operating normally during configuration changes.} \cite{Raft}
+\item \textbf{Leader election}: a new leader must be chosen when an existing leader fails.
+\item \textbf{Log replication}: the leader must accept log entries from clients and replicate them across the cluster, forcing the other logs to agree with its own.\cite{Raft}
+\item \textbf{Safety}: is ensured by the servers state machine safety property \cite{Raft}. This state machine makes sure that no other server can apply a different command at a given log index, that has already been issued.
 \end{itemize}
-Below is a description of the terms they use in this case:
-\begin{itemize}
-\item Log entries: A list of values that should be the same among all processes in the network.
-\item Log replication: A client pushes a new value to the network to the leader, which then replicates this to the rest of the network.
-\item Server: A process in the network.
-\item Heart beat: An empty message repeatedly send to all the followers of the leader, in order to maintain a knowledge of failed process.
-\end{itemize}
+So the basis of this solution is the leader election after which the given leader is responsible to replicate commands it receives from a client to the rest of the network. \\
+It should also be noted that, since Raft relies on majority votes, the algorithm can only uphold these properties in a network of $3F \leq N$, where $F$ is the amount of failures and $N$ is the amount of processes in the system. 

@@ -4,19 +4,20 @@ The tool we are implementing should serve as an illustration tool, to show how t
 
 \begin{enumerate}
 \item The tool must illustrate a scenario of a given set of processes in a distributed system, in which a leader is elected.
-\item The user must then be able to disconnect the leader.
-	\begin{enumerate}
-	\item If a leader is disconnected a new leader must be elected automatically.
-	\end{enumerate}
 \item The user must be able to add new processes to the system.
-\item The user should be able to input parameters to vary the scenario, such as the number of processes, and the “heart rate” of the system.
-	\begin{enumerate}
-	\item The system should be able to have the parameters changed at run-time.
-	\end{enumerate}
+\item The user should be able to input parameters to vary the scenario, such as the number of processes.
 \item The tool must be an implementation of the Raft algorithm.
 	\begin{enumerate}
 	\item The Raft implementation should have the following properties: Safety, availability, timing independence, and that commands complete as soon as a majority has responded. 
 	\end{enumerate}
 \item The tool could be further extended with a visualisation of the given distributed system.
+\end{enumerate}
+\textbf{TBD:}
+\begin{enumerate}
+\item The user must then be able to disconnect the leader.
+	\begin{enumerate}
+	\item If a leader is disconnected a new leader must be elected automatically.
+	\end{enumerate}
+\item The system should be able to have the parameters changed at run-time.
 \end{enumerate}
 
