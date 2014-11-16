@@ -11,7 +11,7 @@ Server = (function() {
     this.votedFor = null;
   };
 
-  Server.prototype.onReceiveRequest = function(logEntry) {
+  Server.prototype.onReceiveClientRequest = function(logEntry) {
     if (this.isLeader()) {
       this.log.append({"index": logEntry.index, "term": this.currentTerm})
       return {
