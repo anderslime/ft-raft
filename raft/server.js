@@ -50,11 +50,8 @@ Server = (function() {
   Server.prototype.startElection = function() {
     this.currentTerm += 1;
     this.votedFor = this.id;
-    var voteResponses = [];
     var _me = this;
-    this.otherPeers().map(function(peer) {
-      voteResponses.push(_me.invokeVoteRequest(peer));
-    });
+    var voteResponses = this._collectVotesFromOtherPeers();
     this.becomeLeaderIfMajorityOfVotesReceived(voteResponses);
   }
 
@@ -185,9 +182,16 @@ Server = (function() {
     return this.cluster.isLargerThanMajority(totalVotes);
   }
 
+  Server.prototype._collectVotesFromOtherPeers = function() {
+    var _me = this;
+    return this.otherPeers().map(function(peer) {
+      return _me.invokeVoteRequest(peer);
+    });
+  }
+
   Server.prototype._becomeLeader = function() {
     this.state = 'leader';
-  };
+  }
 
   return Server;
 
