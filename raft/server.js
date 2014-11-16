@@ -59,12 +59,10 @@ Server = (function() {
     this.currentTerm += 1;
     this.votedFor = this.id;
     var voteResponses = [];
-    for (peerIndex in this.cluster.peers) {
-      var peer = this.cluster.peers[peerIndex];
-      if (peer.id !== this.id) {
-        voteResponses.push(this.invokeVoteRequest(peer))
-      }
-    }
+    var _me = this;
+    this.otherPeers().map(function(peer) {
+      voteResponses.push(_me.invokeVoteRequest(peer));
+    });
     this.becomeLeaderIfMajorityOfVotesReceived(voteResponses);
   }
 
@@ -75,6 +73,13 @@ Server = (function() {
     if (this.hasGrantedMajorityOfVotes(positiveVotes)) {
       this.becomeLeader();
     }
+  }
+
+  Server.prototype.otherPeers = function() {
+    var _me = this;
+    return this.cluster.peers.filter(function(peer) {
+      return peer.id !== _me.id;
+    });
   }
 
   Server.prototype.invokeVoteRequest = function(targetPeer) {
