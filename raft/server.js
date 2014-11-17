@@ -39,11 +39,8 @@ Server = (function() {
   }
 
   Server.prototype.onTimeout = function(withElection){
-    if (withElection === undefined) withElection = true;
     this.state = "candidate";
-    if (withElection) {
-      this._startElection()
-    }
+    this._startElection()
   }
 
   Server.prototype.invokeVoteRequest = function(targetPeer) {
@@ -195,6 +192,5 @@ Server = (function() {
   return Server;
 
 })();
-
 
 module.exports = Server;

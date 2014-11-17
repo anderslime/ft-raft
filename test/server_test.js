@@ -27,12 +27,6 @@ describe("Rules for Followers", function() {
     });
   });
 
-  it("Server timeouts and becomes a candidate when without election", function(){
-    var server = new Server(1, [], 'follower');
-    server.onTimeout(false);
-    assert.equal(server.state, "candidate");
-  });
-
   it("Server starts an election after timeout", function(){
     var server = new Server(1, [], 'follower');
     server.onTimeout();
