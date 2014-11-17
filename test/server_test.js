@@ -23,7 +23,10 @@ describe("Rules for Followers", function() {
     });
 
     it("responds to AppendEntries RPC from leader", function() {
-      // TODO: Implement this with AppendEntries
+      var server1 = new Server(1, [], 'leader');
+      var server2 = new Server(2, [], 'follower');
+      response = server1.invokeVoteRequest(server2);
+      assert.isNotNull(response);
     });
   });
 
