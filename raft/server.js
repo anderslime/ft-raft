@@ -13,7 +13,7 @@ Server = (function() {
 
   Server.prototype.onReceiveClientRequest = function(logEntry) {
     if (this.isLeader()) {
-      this.log.append({"index": logEntry.index, "term": this.currentTerm})
+      this.log.append({"index": logEntry.index, "term": this.currentTerm});
       return {
         "isSuccessful": true,
         "leaderId": this.id
@@ -36,12 +36,12 @@ Server = (function() {
 
   Server.prototype.isLeader = function() {
     return this.state == 'leader';
-  }
+  };
 
   Server.prototype.onTimeout = function(withElection){
     this.state = "candidate";
     this._startElection()
-  }
+  };
 
   Server.prototype.invokeVoteRequest = function(targetPeer) {
     return targetPeer.onReceiveRequestVote(
@@ -53,52 +53,58 @@ Server = (function() {
         "lastLogTerm": this._lastLogTerm()
       }
     )
-  }
+  };
 
   Server.prototype.onReceiveRequestVote = function(sourcePeer, requestVote) {
     this._onRemoteProcedureCall(requestVote);
 
     if (this._isValidVote(requestVote)) {
       this.votedFor = requestVote.candidateId;
-      return sourcePeer.invokeVoteResponse({ "term": requestVote.term, "voteGranted": true })
+      return sourcePeer.invokeVoteResponse(
+        { "term": requestVote.term, "voteGranted": true }
+      );
     } else {
-      return sourcePeer.invokeVoteResponse({ "term": this.currentTerm, "voteGranted": false })
+      return sourcePeer.invokeVoteResponse(
+        { "term": this.currentTerm, "voteGranted": false }
+      );
     }
-  }
+  };
 
   Server.prototype.onReceiveAppendEntries = function(sourcePeer, appendEntries) {
     this._onRemoteProcedureCall(appendEntries);
     this.state = "follower";
     if (!this.containsLogEntryWithSameTerm(appendEntries)) {
-      this._deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex)
+      this._deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex);
     }
     return sourcePeer.invokeAppendEntriesResponse(
-      {"term": this.currentTerm,
-       "success": this.appendEntriesSuccessResult(appendEntries)
-      });
-  }
+      {
+        "term": this.currentTerm,
+        "success": this.appendEntriesSuccessResult(appendEntries)
+      }
+    );
+  };
 
   Server.prototype.appendEntriesSuccessResult = function(appendEntries) {
     return !(appendEntries.term < this.currentTerm) &&
             this.containsLogEntryWithSameTerm(appendEntries);
-  }
+  };
 
   Server.prototype.containsLogEntryWithSameTerm = function(appendEntries) {
     return (appendEntries.prevLogIndex === null) ||
            (this.log.entryAt(appendEntries.prevLogIndex) !== undefined &&
             this.log.entryAt(appendEntries.prevLogIndex).term === appendEntries.prevLogTerm);
-  }
+  };
 
 
   Server.prototype.invokeVoteResponse = function(requestVoteResult) {
     this._onRemoteProcedureCall(requestVoteResult);
     return requestVoteResult;
-  }
+  };
 
   Server.prototype.invokeAppendEntriesResponse = function(appendEntriesResult) {
     this._onRemoteProcedureCall(appendEntriesResult);
     return appendEntriesResult;
-  }
+  };
 
   Server.prototype.invokeAppendEntries = function(targetPeer) {
     return targetPeer.onReceiveAppendEntries(
@@ -112,15 +118,15 @@ Server = (function() {
         "leaderCommit": null
       }
     )
-  }
+  };
 
   Server.prototype._lastLogIndex = function() {
     return this.log.lastIndex();
-  }
+  };
 
   Server.prototype._deleteLogEntriesFollowingAndIncluding = function(logIndex) {
     this.log.deleteLogEntriesFollowingAndIncluding(logIndex);
-  }
+  };
 
   // Rules for Servers: If RPC request or response contains term T > currentTerm:
   // set currentTerm = T, convert to follower
@@ -129,30 +135,30 @@ Server = (function() {
       this.currentTerm = rpc.term;
       this.state = 'follower';
     }
-  }
+  };
 
   Server.prototype._isValidVote = function(requestVote) {
     return requestVote.term >= this.currentTerm &&
       (this.votedFor === null || this.votedFor === requestVote.candidateId) &&
       this._isLogAtLeastUpToDateAsRequestVote(requestVote);
-  }
+  };
 
   Server.prototype._isLogAtLeastUpToDateAsRequestVote = function(requestVote) {
     return this.log.isAtLeastUpToDateAs(
       requestVote.lastLogIndex,
       requestVote.lastLogTerm
-    )
-  }
+    );
+  };
 
   Server.prototype._lastLogTerm = function() {
     return this.log.lastLogTerm();
-  }
+  };
 
   Server.prototype._hasGrantedMajorityOfVotes = function(positiveVotes) {
     serversOwnVote = (this.votedFor == this.id) ? 1 : 0;
     var totalVotes = positiveVotes.length + serversOwnVote;
     return this.cluster.isLargerThanMajority(totalVotes);
-  }
+  };
 
   Server.prototype._startElection = function() {
     this.currentTerm += 1;
@@ -160,7 +166,7 @@ Server = (function() {
     var _me = this;
     var voteResponses = this._collectVotesFromOtherPeers();
     this._becomeLeaderIfMajorityOfVotesReceived(voteResponses);
-  }
+  };
 
   Server.prototype._becomeLeaderIfMajorityOfVotesReceived = function(voteResponses) {
     positiveVotes = voteResponses.filter(function(voteResponse) {
@@ -169,25 +175,25 @@ Server = (function() {
     if (this._hasGrantedMajorityOfVotes(positiveVotes)) {
       this._becomeLeader();
     }
-  }
+  };
 
   Server.prototype._collectVotesFromOtherPeers = function() {
     var _me = this;
     return this._otherPeers().map(function(peer) {
       return _me.invokeVoteRequest(peer);
     });
-  }
+  };
 
   Server.prototype._otherPeers = function() {
     var _me = this;
     return this.cluster.peers.filter(function(peer) {
       return peer.id !== _me.id;
     });
-  }
+  };
 
   Server.prototype._becomeLeader = function() {
     this.state = 'leader';
-  }
+  };
 
   return Server;
 
