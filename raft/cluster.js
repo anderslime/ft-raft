@@ -1,16 +1,16 @@
 Cluster = (function() {
   function Cluster(peers) {
     this.peers = peers || [];
-  }
+  };
 
   Cluster.prototype.addPeer = function(server){
     this.peers.push(server);
-  }
+  };
 
   Cluster.prototype.leaderId = function() {
     var leader = this.leader();
     return leader && leader.id;
-  }
+  };
 
   Cluster.prototype.leader = function() {
     var leader = {};
@@ -21,27 +21,27 @@ Cluster = (function() {
       }
     }
     return leader;
-  }
+  };
 
   Cluster.prototype.isLargerThanMajority = function(amount) {
     return amount >= this.peerMajoritySize();
-  }
+  };
 
   Cluster.prototype.peerMajoritySize = function() {
     if (this.hasEventNumberOfPeers()) {
-      return this.amountOfPeers() / 2 + 1
+      return this.amountOfPeers() / 2 + 1;
     } else {
-      return Math.ceil(this.amountOfPeers())
+      return Math.ceil(this.amountOfPeers());
     }
-  }
+  };
 
   Cluster.prototype.hasEventNumberOfPeers = function() {
     return this.amountOfPeers() % 2 == 0;
-  }
+  };
 
   Cluster.prototype.amountOfPeers = function() {
     return this.peers.length;
-  }
+  };
 
   return Cluster;
 })();
