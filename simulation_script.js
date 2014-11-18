@@ -16,7 +16,9 @@ updatePeers = function(servers) {
 var server1 = new Server(1, [], 'follower');
 var server2 = new Server(2, [], 'follower');
 var server3 = new Server(3, [], 'follower');
-var peers = [server1, server2, server3];
+var server4 = new Server(4, [], 'follower');
+var server5 = new Server(5, [], 'follower');
+var peers = [server1, server2, server3, server4, server5];
 updatePeers(peers);
 
 function drawScreen() {
