@@ -11,6 +11,7 @@ Server = (function() {
     this.currentTerm = currentTerm || 0;
     this.votedFor = null;
     this.leaderState = new LeaderState(this._lastLogIndex());
+    this.electionTimeoutSeconds = 150;
   };
 
   Server.prototype.nextIndexFor = function(peerId) {
