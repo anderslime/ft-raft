@@ -2,6 +2,9 @@ var Log = require('./log');
 var Cluster = require('./cluster');
 var LeaderState = require('./leader_state');
 
+HEART_BEAT_INTERVAL_IN_MILLI_SECONDS = 500;
+ELECTION_TIMER_INTERVAL = 2000;
+
 Server = (function() {
   function Server(id, peers, state, currentTerm, log) {
     this.id = id;
@@ -11,7 +14,8 @@ Server = (function() {
     this.currentTerm = currentTerm || 0;
     this.votedFor = null;
     this.leaderState = new LeaderState(this._lastLogIndex());
-    this.electionTimeoutSeconds = 150;
+    this.electionTimeoutMilSec = ELECTION_TIMER_INTERVAL;
+    this.heartBeatInterval = null;
   };
 
   Server.prototype.nextIndexFor = function(peerId) {
@@ -20,6 +24,14 @@ Server = (function() {
 
   Server.prototype.matchIndexFor = function(peerId) {
     return this.leaderState.matchIndexFor(peerId);
+  };
+
+  Server.prototype.decrementElectionTimeout = function(milliSeconds) {
+    if (this.isLeader()) return;
+    this.electionTimeoutMilSec = this.electionTimeoutMilSec - milliSeconds;
+    if (this.electionTimeoutMilSec <= 0) {
+      this.onTimeout();
+    }
   };
 
   Server.prototype.onReceiveClientRequest = function(logEntry) {
@@ -49,9 +61,10 @@ Server = (function() {
     return this.state == 'leader';
   };
 
-  Server.prototype.onTimeout = function(withElection){
-    this.state = "candidate";
-    this._startElection()
+  Server.prototype.onTimeout = function(){
+    if (this.isLeader()) return;
+    this._becomeCandidate();
+    this._startElection();
   };
 
   Server.prototype.invokeVoteRequest = function(targetPeer) {
@@ -70,7 +83,7 @@ Server = (function() {
     this._onRemoteProcedureCall(requestVote);
 
     if (this._isValidVote(requestVote)) {
-      this.votedFor = requestVote.candidateId;
+      this._voteFor(requestVote.candidateId);
       return sourcePeer.invokeVoteResponse(
         { "term": requestVote.term, "voteGranted": true }
       );
@@ -83,6 +96,8 @@ Server = (function() {
 
   Server.prototype.onReceiveAppendEntries = function(sourcePeer, appendEntries) {
     this._onRemoteProcedureCall(appendEntries);
+    this.votedFor = null;
+    this._resetElectionTimer();
     this.state = "follower";
     if (!this.containsLogEntryWithSameTerm(appendEntries)) {
       this._deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex);
@@ -108,7 +123,6 @@ Server = (function() {
             this.log.entryAt(appendEntries.prevLogIndex).term === appendEntries.prevLogTerm);
   };
 
-
   Server.prototype.invokeVoteResponse = function(requestVoteResult) {
     this._onRemoteProcedureCall(requestVoteResult);
     return requestVoteResult;
@@ -122,7 +136,7 @@ Server = (function() {
     } else {
       this.leaderState.decrementNextIndex(targetPeerId);
     }
-    
+
     return appendEntriesResult;
   };
 
@@ -161,7 +175,7 @@ Server = (function() {
   Server.prototype._onRemoteProcedureCall = function(rpc) {
     if (rpc.term > this.currentTerm) {
       this.currentTerm = rpc.term;
-      this.state = 'follower';
+      this._becomeFollower();
     }
   };
 
@@ -191,9 +205,14 @@ Server = (function() {
   Server.prototype._startElection = function() {
     this.currentTerm += 1;
     this.votedFor = this.id;
+    this._resetElectionTimer();
     var _me = this;
     var voteResponses = this._collectVotesFromOtherPeers();
     this._becomeLeaderIfMajorityOfVotesReceived(voteResponses);
+  };
+
+  Server.prototype._resetElectionTimer = function() {
+    this.electionTimeoutMilSec = ELECTION_TIMER_INTERVAL;
   };
 
   Server.prototype._becomeLeaderIfMajorityOfVotesReceived = function(voteResponses) {
@@ -219,8 +238,35 @@ Server = (function() {
     });
   };
 
+  Server.prototype._voteFor = function(candidateId) {
+    this.votedFor = candidateId;
+    this._resetElectionTimer();
+  };
+
+  Server.prototype._becomeCandidate = function() {
+    this.state = 'candidate';
+    clearTimeout(this.heartBeatInterval);
+  };
+
+  Server.prototype._becomeFollower = function() {
+    this.state = 'follower';
+    clearTimeout(this.heartBeatInterval);
+  };
+
   Server.prototype._becomeLeader = function() {
     this.state = 'leader';
+    this.votedFor = null;
+    var _me = this;
+    this.heartBeatInterval = setInterval(function() {
+      _me._invokeAppendEntriesOnPeers();
+    }, HEART_BEAT_INTERVAL_IN_MILLI_SECONDS);
+  };
+
+  Server.prototype._invokeAppendEntriesOnPeers = function() {
+    var _me = this;
+    this._otherPeers().map(function(peer) {
+      _me.invokeAppendEntries(peer);
+    });
   };
 
   return Server;

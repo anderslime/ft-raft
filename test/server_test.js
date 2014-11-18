@@ -29,13 +29,6 @@ describe("Rules for Followers", function() {
       assert.isNotNull(response);
     });
   });
-
-  it("Server starts an election after timeout", function(){
-    var server = new Server(1, [], 'follower');
-    server.onTimeout();
-    assert.equal(server.currentTerm, 1);
-    assert.equal(server.votedFor, 1);
-  });
 });
 
   // Rules for servers: Candidates ($5.2)
@@ -49,6 +42,9 @@ describe("Rules for Candidates", function() {
 
     it("votes for self", function() {
       var server1 = new Server(1, [], 'follower', 1);
+      var server2 = new Server(2, [], 'follower', 1);
+      updatePeers([server1, server2])
+      server2.votedFor = 2;
       server1.onTimeout();
       assert.equal(server1.votedFor, 1)
     });
