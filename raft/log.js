@@ -4,7 +4,11 @@ Log = (function() {
   };
 
   Log.prototype.append = function(logEntry) {
-    this.logEntries.push(logEntry);
+    if (Array.isArray(logEntry)) {
+      this._appendLogEntries(logEntry);
+    } else {
+      this.logEntries.push(logEntry);
+    }
   };
 
   Log.prototype.entryAt = function(index) {
@@ -35,6 +39,12 @@ Log = (function() {
   Log.prototype.lastLogTerm = function() {
     if (this.logEntries.length === 0) return 0;
     return this.lastEntry().term;
+  };
+
+  Log.prototype._appendLogEntries = function(newLogEntries) {
+    for (var logEntryIndex in newLogEntries) {
+      this.logEntries.push(newLogEntries[logEntryIndex])
+    }
   };
 
   return Log;

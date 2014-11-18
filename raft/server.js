@@ -86,6 +86,7 @@ Server = (function() {
     if (!this.containsLogEntryWithSameTerm(appendEntries)) {
       this._deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex);
     }
+    this.log.append(appendEntries.entries);
     return sourcePeer.invokeAppendEntriesResponse(
       this.id,
       {
@@ -132,10 +133,18 @@ Server = (function() {
         "leaderId": this.id,
         "prevLogIndex": this._lastLogIndex(),
         "prevLogTerm": this._lastLogTerm(),
-        "entries": [],
+        "entries": this._entries(targetPeer),
         "leaderCommit": null
       }
     )
+  };
+
+  Server.prototype._entries = function(targetPeer) {
+    if (this._lastLogIndex() >= this.leaderState.nextIndexFor(targetPeer.id)) {
+      return [this.log.entryAt(this.leaderState.nextIndexFor(targetPeer.id))];
+    } else {
+      return [];      
+    }
   };
 
   Server.prototype._lastLogIndex = function() {
