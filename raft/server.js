@@ -1,18 +1,26 @@
 var Log = require('./log');
 var Cluster = require('./cluster');
+var LeaderState = require('./leader_state');
 
 Server = (function() {
-  function Server(id, peers, state, currentTerm) {
+  function Server(id, peers, state, currentTerm, log) {
     this.id = id;
     this.cluster = new Cluster(peers.concat(this));
     this.state = state || 'follower';
-    this.log = new Log();
+    this.log = log || new Log();
     this.currentTerm = currentTerm || 0;
     this.votedFor = null;
+    this.leaderState = new LeaderState(this._lastLogIndex());
+  };
+
+  Server.prototype.nextIndexFor = function(peerId) {
+    return this.leaderState.nextIndexFor(peerId);
   };
 
   Server.prototype.onReceiveClientRequest = function(logEntry) {
+    console.log(this.state)
     if (this.isLeader()) {
+      console.log(this.log)
       this.log.append({"index": logEntry.index, "term": this.currentTerm});
       return {
         "isSuccessful": true,
