@@ -7,8 +7,8 @@
 \contentsline {subsection}{\numberline {1.3}Raft}{5}{subsection.1.3}
 \contentsline {section}{\numberline {2}Requirements}{7}{section.2}
 \contentsline {section}{\numberline {3}Analysis}{8}{section.3}
-\contentsline {subsection}{\numberline {3.1}Impossibility of the Two Generals Problem}{8}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Raft as a solution}{8}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.1}Existing Raft Implementations}{8}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Testing}{8}{subsection.3.2}
 \contentsline {section}{\numberline {4}Design}{9}{section.4}
 \contentsline {section}{\numberline {5}Implementation}{10}{section.5}
 \contentsline {section}{\numberline {6}Tests}{11}{section.6}
