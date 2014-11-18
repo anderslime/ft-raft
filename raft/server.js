@@ -3,7 +3,7 @@ var Cluster = require('./cluster');
 var LeaderState = require('./leader_state');
 
 HEART_BEAT_INTERVAL_IN_MILLI_SECONDS = 500;
-ELECTION_TIMER_INTERVAL = 2000;
+ELECTION_TIMER_INTERVAL = [1500, 3000];
 
 Server = (function() {
   function Server(id, peers, state, currentTerm, log) {
@@ -14,7 +14,8 @@ Server = (function() {
     this.currentTerm = currentTerm || 0;
     this.votedFor = null;
     this.leaderState = new LeaderState(this._lastLogIndex());
-    this.electionTimeoutMilSec = ELECTION_TIMER_INTERVAL;
+    this.electionTimeoutMilSec = null;
+    this._resetElectionTimer();
     this.heartBeatInterval = null;
   };
 
@@ -212,8 +213,15 @@ Server = (function() {
   };
 
   Server.prototype._resetElectionTimer = function() {
-    this.electionTimeoutMilSec = ELECTION_TIMER_INTERVAL;
+    this.electionTimeoutMilSec = this._randomNumberBetween(
+      ELECTION_TIMER_INTERVAL[0],
+      ELECTION_TIMER_INTERVAL[1]
+    )
   };
+
+  Server.prototype._randomNumberBetween = function(min, max) {
+    return Math.floor((Math.random() * (max - min)) + min)
+  }
 
   Server.prototype._becomeLeaderIfMajorityOfVotesReceived = function(voteResponses) {
     positiveVotes = voteResponses.filter(function(voteResponse) {
