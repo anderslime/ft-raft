@@ -28,20 +28,22 @@ function drawScreen() {
       [
         "Server ",
         server.id,
-        " ('{",
-        serverColor(server),
-        ":",
-        server.state,
-        "}'): ",
+        " ('",
+        inColor(serverColor(server), server.state),
+        "'): ",
         server.electionTimeoutMilSec
       ].join("")
     );
   });
 }
 
+function inColor(color, text) {
+  return "{"+color+":"+text+"}";
+}
+
 function serverColor(server) {
   if (server.isLeader()) return 'green';
-  return 'blue';
+  return 'yellow';
 }
 
 
