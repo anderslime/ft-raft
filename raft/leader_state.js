@@ -5,8 +5,12 @@ LeaderState = ( function(){
 	};
 
 	LeaderState.prototype.nextIndexFor = function(peerIndex) {
-		console.log(this)
-		return this.nextIndex[peerIndex] || (this.lastLogIndex + 1);
+		if (this.nextIndex[peerIndex] === undefined) return this.lastLogIndex + 1;
+		return this.nextIndex[peerIndex];
+	};
+
+	LeaderState.prototype.decrementNextIndex = function(peerIndex) {
+		this.nextIndex[peerIndex] = this.nextIndexFor(peerIndex) - 1;
 	};
 
 

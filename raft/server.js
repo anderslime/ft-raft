@@ -85,6 +85,7 @@ Server = (function() {
       this._deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex);
     }
     return sourcePeer.invokeAppendEntriesResponse(
+      this.id,
       {
         "term": this.currentTerm,
         "success": this.appendEntriesSuccessResult(appendEntries)
@@ -109,8 +110,13 @@ Server = (function() {
     return requestVoteResult;
   };
 
-  Server.prototype.invokeAppendEntriesResponse = function(appendEntriesResult) {
+  Server.prototype.invokeAppendEntriesResponse = function(targetPeerId, appendEntriesResult) {
     this._onRemoteProcedureCall(appendEntriesResult);
+    console.log(appendEntriesResult)
+    if(!appendEntriesResult.success){
+      this.leaderState.decrementNextIndex(targetPeerId);
+    }
+    
     return appendEntriesResult;
   };
 

@@ -275,5 +275,6 @@ describe("General rules for servers",function(){
     assert.equal(server1.nextIndexFor(2), 1);
     var response = server1.invokeAppendEntries(server2);
     assert.equal(response.success,false);
+    assert.equal(server1.nextIndexFor(2), 0)
   })
 });
