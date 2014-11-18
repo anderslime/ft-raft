@@ -143,7 +143,7 @@ Server = (function() {
     if (this._lastLogIndex() >= this.leaderState.nextIndexFor(targetPeer.id)) {
       return [this.log.entryAt(this.leaderState.nextIndexFor(targetPeer.id))];
     } else {
-      return [];      
+      return [];
     }
   };
 
