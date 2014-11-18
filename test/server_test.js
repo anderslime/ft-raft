@@ -269,12 +269,19 @@ describe("Client Log Entry Request", function() {
 
 });
 describe("General rules for servers",function(){
+  it("If successful: ipdate nextIndex and matchIndex for follower.",function(){
+    var server1 = new Server(1, [], 'candidate', 2, new Log([{"index": 1, "term": 1},{"index": 1, "term": 1}]));
+    var server2 = new Server(2, [], 'follower', 2, new Log([{"index": 1, "term": 1},{"index": 1, "term": 1}]));
+    var response = server1.invokeAppendEntries(server2);
+    assert.equal(response.success,true);
+    assert.equal(server1.matchIndexFor(server2.id),1);
+  })
   it("If AppendEntries fails because of log inconsistency: decrement nextIndex and retry.",function(){
     var server1 = new Server(1, [], 'candidate', 2, new Log([{"index": 1, "term": 2}]));
     var server2 = new Server(2, [], 'follower', 2, new Log([{"index": 1, "term": 1}]));
     assert.equal(server1.nextIndexFor(2), 1);
     var response = server1.invokeAppendEntries(server2);
     assert.equal(response.success,false);
-    assert.equal(server1.nextIndexFor(2), 0)
+    assert.equal(server1.nextIndexFor(2), 0);
   })
 });

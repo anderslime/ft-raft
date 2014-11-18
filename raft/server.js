@@ -17,10 +17,12 @@ Server = (function() {
     return this.leaderState.nextIndexFor(peerId);
   };
 
+  Server.prototype.matchIndexFor = function(peerId) {
+    return this.leaderState.matchIndexFor(peerId);
+  };
+
   Server.prototype.onReceiveClientRequest = function(logEntry) {
-    console.log(this.state)
     if (this.isLeader()) {
-      console.log(this.log)
       this.log.append({"index": logEntry.index, "term": this.currentTerm});
       return {
         "isSuccessful": true,
@@ -112,8 +114,10 @@ Server = (function() {
 
   Server.prototype.invokeAppendEntriesResponse = function(targetPeerId, appendEntriesResult) {
     this._onRemoteProcedureCall(appendEntriesResult);
-    console.log(appendEntriesResult)
-    if(!appendEntriesResult.success){
+    if(appendEntriesResult.success){
+      this.leaderState.incrementNextIndex(targetPeerId);
+      this.leaderState.setMatchIndex(targetPeerId, this._lastLogIndex());
+    } else {
       this.leaderState.decrementNextIndex(targetPeerId);
     }
     
