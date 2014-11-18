@@ -116,7 +116,7 @@ describe("Rules for Candidates", function() {
         var server5 = new Server(5, [], 'candidate');
         server4.votedFor = 5;
         server5.votedFor = 5;
-        updatePeers([server1, server2, server3])
+        updatePeers([server1, server2, server3, server4, server5])
         server1.onTimeout()
         assert.equal(server1.state, 'leader');
       });
@@ -130,7 +130,7 @@ describe("Rules for Candidates", function() {
         server3.votedFor = 5;
         server4.votedFor = 5;
         server5.votedFor = 5;
-        updatePeers([server1, server2, server3]);
+        updatePeers([server1, server2, server3, server4, server5]);
         server1.onTimeout();
         assert.equal(server1.state, 'candidate');
       });
@@ -143,7 +143,7 @@ describe("Rules for Candidates", function() {
         var server3 = new Server(3, [], 'follower');
         var server4 = new Server(4, [], 'candidate');
         server4.votedFor = 4;
-        updatePeers([server1, server2, server3])
+        updatePeers([server1, server2, server3, server4])
         server1.onTimeout()
         assert.equal(server1.state, 'leader');
       });
@@ -151,12 +151,13 @@ describe("Rules for Candidates", function() {
       it("does not become leader when only receiving 2 votes", function() {
         var server1 = new Server(1, [], 'follower');
         var server2 = new Server(2, [], 'follower');
-        var server3 = new Server(3, [], 'candidate');
+        var server3 = new Server(3, [], 'follower');
+        var server4 = new Server(4, [], 'candidate');
+        server1.votedFor = 3;
         server2.votedFor = 3;
-        server3.votedFor = 3;
-        updatePeers([server1, server2, server3]);
-        server1.onTimeout();
-        assert.equal(server1.state, 'candidate');
+        updatePeers([server1, server2, server3, server4]);
+        server4.onTimeout();
+        assert.equal(server4.state, 'candidate');
       });
     });
   });

@@ -31,7 +31,7 @@ Cluster = (function() {
     if (this.hasEventNumberOfPeers()) {
       return this.amountOfPeers() / 2 + 1;
     } else {
-      return Math.ceil(this.amountOfPeers());
+      return Math.ceil(this.amountOfPeers() / 2);
     }
   };
 
