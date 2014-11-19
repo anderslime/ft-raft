@@ -243,10 +243,10 @@ describe("Rules for Candidates", function() {
 describe("Client Log Entry Request", function() {
   it("client sends log request to server", function() {
     var server = new Server(1, [], 'leader');
-    var logEntry = {"index": 1};
+    var logEntry = {"value": 1};
     var response = server.onReceiveClientRequest(logEntry);
     assert.equal(server.log.length(), 1);
-    assert.equal(server.lastLogEntry().index, 1);
+    assert.equal(server.lastLogEntry().value, 1);
     assert.equal(server.lastLogEntry().term, 0);
     assert.equal(response.isSuccessful, true);
 

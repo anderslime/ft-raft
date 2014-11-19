@@ -49,7 +49,7 @@ Server = (function() {
   Server.prototype.onReceiveClientRequest = function(logEntry) {
     if (this.isDown) return;
     if (this.isLeader()) {
-      this.log.append({"index": logEntry.index, "term": this.currentTerm});
+      this.log.append({"value": logEntry.value, "term": this.currentTerm});
       return {
         "isSuccessful": true,
         "leaderId": this.id
