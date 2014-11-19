@@ -12,24 +12,28 @@ Log = (function() {
   };
 
   Log.prototype.entryAt = function(index) {
-    return this.logEntries[index];
+    return this.logEntries[index - 1];
   };
 
   Log.prototype.lastEntry = function() {
-    return this.logEntries[this.lastIndex()];
+    return this.entryAt(this.lastIndex())
   };
 
   Log.prototype.lastIndex = function() {
-    if (this.logEntries.length === 0) return null;
-    return this.logEntries.length - 1;
+    return this.logEntries.length;
   };
 
   Log.prototype.deleteLogEntriesFollowingAndIncluding = function(logIndex) {
-    this.logEntries.splice(logIndex, this.logEntries.length - logIndex);
+    var realIndex = logIndex - 1;
+    this.logEntries.splice(realIndex, this.logEntries.length - realIndex);
   };
 
   Log.prototype.length = function() {
     return this.logEntries.length;
+  };
+
+  Log.prototype.entryRange = function(fromIndex, toIndex) {
+    return this.logEntries.slice(fromIndex - 1, toIndex - 1);
   };
 
   Log.prototype.isAtLeastUpToDateAs = function(logIndex, logTerm) {

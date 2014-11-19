@@ -108,7 +108,8 @@ Server = (function() {
       this.id,
       {
         "term": this.currentTerm,
-        "success": this.appendEntriesSuccessResult(appendEntries)
+        "success": this.appendEntriesSuccessResult(appendEntries),
+        "matchIndex": this.log.lastIndex()
       }
     );
   };
@@ -119,7 +120,7 @@ Server = (function() {
   };
 
   Server.prototype.containsLogEntryWithSameTerm = function(appendEntries) {
-    return (appendEntries.prevLogIndex === null) ||
+    return (appendEntries.prevLogIndex === 0) ||
            (this.log.entryAt(appendEntries.prevLogIndex) !== undefined &&
             this.log.entryAt(appendEntries.prevLogIndex).term === appendEntries.prevLogTerm);
   };
@@ -132,8 +133,12 @@ Server = (function() {
   Server.prototype.invokeAppendEntriesResponse = function(targetPeerId, appendEntriesResult) {
     this._onRemoteProcedureCall(appendEntriesResult);
     if(appendEntriesResult.success){
-      this.leaderState.incrementNextIndex(targetPeerId);
-      this.leaderState.setMatchIndex(targetPeerId, this._lastLogIndex());
+      var matchIndex = Math.max(
+        this.leaderState.matchIndexFor(targetPeerId),
+        appendEntriesResult.matchIndex
+      );
+      this.leaderState.setMatchIndex(targetPeerId, matchIndex);
+      this.leaderState.setNextIndex(targetPeerId, matchIndex + 1);
     } else {
       this.leaderState.decrementNextIndex(targetPeerId);
     }
@@ -142,22 +147,31 @@ Server = (function() {
   };
 
   Server.prototype.invokeAppendEntries = function(targetPeer) {
+    var prevLogIndex = this.leaderState.nextIndexFor(targetPeer.id) - 1;
     return targetPeer.onReceiveAppendEntries(
       this,
       {
         "term": this.currentTerm,
         "leaderId": this.id,
-        "prevLogIndex": this._lastLogIndex(),
-        "prevLogTerm": this._lastLogTerm(),
+        "prevLogIndex": prevLogIndex,
+        "prevLogTerm": this._termAtLogEntry(prevLogIndex),
         "entries": this._entries(targetPeer),
         "leaderCommit": null
       }
     )
   };
 
+  Server.prototype._termAtLogEntry = function(entryIndex) {
+    if (entryIndex === 0) return null;
+    return this.log.entryAt(entryIndex).term
+  };
+
   Server.prototype._entries = function(targetPeer) {
     if (this._lastLogIndex() >= this.leaderState.nextIndexFor(targetPeer.id)) {
-      return [this.log.entryAt(this.leaderState.nextIndexFor(targetPeer.id))];
+      return this.log.entryRange(
+        this.leaderState.nextIndexFor(targetPeer.id),
+        this._lastLogIndex() + 1
+      );
     } else {
       return [];
     }
@@ -225,7 +239,7 @@ Server = (function() {
 
   Server.prototype._becomeLeaderIfMajorityOfVotesReceived = function(voteResponses) {
     positiveVotes = voteResponses.filter(function(voteResponse) {
-      return voteResponse.voteGranted;
+      return voteResponse && voteResponse.voteGranted;
     });
     if (this._hasGrantedMajorityOfVotes(positiveVotes)) {
       this._becomeLeader();
@@ -265,6 +279,7 @@ Server = (function() {
     this.state = 'leader';
     this.votedFor = null;
     var _me = this;
+    this.leaderState = new LeaderState(this._lastLogIndex());
     this.heartBeatInterval = setInterval(function() {
       _me._invokeAppendEntriesOnPeers();
     }, HEART_BEAT_INTERVAL_IN_MILLI_SECONDS);
