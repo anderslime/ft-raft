@@ -57,7 +57,8 @@ function drawScreen() {
       "'): ",
       server.electionTimeoutMilSec,
     ].join("")
-    secondLine = "[" + server.log.logEntries.map(function(logEntry) {
+    puncuations = server.log.length() > 5 ? '... ' : '';
+    secondLine = "[" + puncuations + server.log.logEntries.slice(-5).map(function(logEntry) {
       return ["v->", logEntry.value,", t->", logEntry.term].join("")
     }).join("], [") + "]"
     clivas.line(firstLine);
