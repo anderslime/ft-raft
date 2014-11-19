@@ -4,6 +4,7 @@ var LeaderState = require('./leader_state');
 
 HEART_BEAT_INTERVAL_IN_MILLI_SECONDS = 500;
 ELECTION_TIMER_INTERVAL = [1500, 3000];
+CLOCK_INTERVAL_IN_MIL_SEC = 50;
 
 Server = (function() {
   function Server(id, peers, state, currentTerm, log) {
@@ -18,6 +19,10 @@ Server = (function() {
     this._resetElectionTimer();
     this.heartBeatInterval = null;
     this.isDown = false;
+    var _me = this;
+    this.electionTimer = setInterval(function() {
+      _me.decrementElectionTimeout(CLOCK_INTERVAL_IN_MIL_SEC);
+    }, CLOCK_INTERVAL_IN_MIL_SEC);
   };
 
   Server.prototype.nextIndexFor = function(peerId) {

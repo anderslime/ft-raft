@@ -1,9 +1,13 @@
-var clivas = require('clivas');
 var EventEmitter = require("events").EventEmitter;
-var raft = require('./raft')
+var raft = require('./raft');
+var Canvas = require('./raft_sim/canvas');
+
+DRAW_SCREEN_EVERY_MILLI_SECOND = 100;
 
 // Server seup
 var cluster = raft.buildCluster(5);
+var canvas = new Canvas(cluster);
+canvas.startDrawingEvery(DRAW_SCREEN_EVERY_MILLI_SECOND);
 
 // Server configuration
 var http = require('http');
@@ -27,60 +31,3 @@ http.createServer(function (request, response) {
       response.end("COMMAND NOT RECOGNIZED");
     }
 }).listen(8080);
-
-
-// Drawing stuff
-function drawScreen() {
-  clivas.clear();
-  cluster.servers.map(function(server) {
-    firstLine = [
-      "Server ",
-      server.id,
-      " lastLogIndex: ",
-      server._lastLogIndex(),
-      " ('",
-      inColor(serverColor(server), server.state),
-      "'): ",
-      server.electionTimeoutMilSec,
-    ].join("")
-    puncuations = server.log.length() > 5 ? '... ' : '';
-    secondLine = "[" + puncuations + server.log.logEntries.slice(-5).map(function(logEntry) {
-      return ["v->", logEntry.value,", t->", logEntry.term].join("")
-    }).join("], [") + "]"
-    clivas.line(firstLine);
-    clivas.line(secondLine);
-  });
-}
-
-function inColor(color, text) {
-  return "{"+color+":"+text+"}";
-}
-
-function serverColor(server) {
-  if (server.isDown) return 'red';
-  if (server.isLeader()) return 'green';
-  return 'yellow';
-}
-
-
-// Clock stuff
-CLOCK_INTERVAL_IN_MIL_SEC = 100;
-var ee = new EventEmitter();
-
-ee.on("clock", function (theServer) {
-  theServer.decrementElectionTimeout(CLOCK_INTERVAL_IN_MIL_SEC);
-  drawScreen();
-});
-
-var clocks = [];
-
-setupClock = function(peer) {
-  setInterval(function() {
-    ee.emit("clock", peer);
-  }, CLOCK_INTERVAL_IN_MIL_SEC);
-}
-
-for (var peerIndex in cluster.servers) {
-  var peer = cluster.servers[peerIndex];
-  setupClock(peer)
-}
