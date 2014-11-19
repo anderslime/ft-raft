@@ -1,8 +1,6 @@
 var Server = require('./raft/server')
 var clivas = require('clivas');
-var fs = require('fs');
 var EventEmitter = require("events").EventEmitter;
-fs.unlink('log.log');
 
 // Server seup
 updatePeers = function(servers) {
@@ -64,22 +62,6 @@ function drawScreen() {
     }).join("], [") + "]"
     clivas.line(firstLine);
     clivas.line(secondLine);
-    fs.appendFile("log.log", firstLine + "\n");
-    fs.appendFile("log.log", secondLine + "\n");
-    if (server.isLeader()) {
-      nextIndexLine = [
-        "next index:",
-        server.leaderState.nextIndex.toString()
-      ].join(" ")
-      matchIndexLine = [
-        "match index: ",
-        server.leaderState.matchIndex.toString()
-      ].join(" ")
-      // clivas.line(nextIndexLine);
-      // clivas.line(matchIndexLine);
-      fs.appendFile("log.log", nextIndexLine + "\n");
-      fs.appendFile("log.log", matchIndexLine + "\n");
-    }
   });
 }
 
