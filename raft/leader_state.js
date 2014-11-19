@@ -18,6 +18,10 @@ LeaderState = ( function(){
     this.nextIndex[peerIndex] = this.nextIndexFor(peerIndex) + 1;
   };
 
+  LeaderState.prototype.setNextIndex = function(peerIndex, nextIndex) {
+    this.nextIndex[peerIndex] = nextIndex;
+  };
+
   LeaderState.prototype.setMatchIndex = function(peerIndex, matchedIndex) {
     this.matchIndex[peerIndex] = matchedIndex;
   };
