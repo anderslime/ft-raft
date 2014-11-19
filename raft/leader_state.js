@@ -27,7 +27,9 @@ LeaderState = ( function(){
   };
 
   LeaderState.prototype.matchIndexFor = function(peerIndex) {
-    return this.matchIndex[peerIndex];
+    var matchIndex = this.matchIndex[peerIndex];
+    if (matchIndex === undefined) return -1;
+    return matchIndex;
   };
 
 
