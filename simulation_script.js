@@ -1,21 +1,9 @@
-var Server = require('./raft/server')
 var clivas = require('clivas');
 var EventEmitter = require("events").EventEmitter;
+var raft = require('./raft')
 
 // Server seup
-updatePeers = function(servers) {
-  for (serverId in servers) {
-    for (otherServerId in servers) {
-      if (otherServerId != serverId) {
-        servers[serverId].addPeer(servers[otherServerId]);
-      }
-    }
-  }
-}
-var servers = [1,2,3,4,5].map(function(serverId) {
-  return new Server(serverId, [], 'follower');
-});
-updatePeers(servers);
+var cluster = raft.buildCluster(5);
 
 // Server configuration
 var http = require('http');
@@ -27,15 +15,13 @@ http.createServer(function (request, response) {
     var query = parsedUrl.query;
     var responseMessage = "No Command\n";
     if (query.command.toString() === 'crash' && query.serverId) {
-      servers[parseInt(query.serverId) - 1].crash();
+      cluster.crash(parseInt(query.serverId))
       response.end("CRASHING SERVER " + query.serverId + "\n");
     } else if (query.command === 'restart' && query.serverId) {
-      servers[parseInt(query.serverId) - 1].restart();
+      cluster.restart(parseInt(query.serverId))
       response.end("RESTARTING SERVER " + query.serverId + "\n");
     } else if (query.command === 'request' && query.value) {
-      var raftResponse = servers[parseInt(query.serverId) - 1].onReceiveClientRequest({
-        "value": query.value
-      })
+      cluster.request(parseInt(query.serverId), query.value)
       response.end("SUCCESS: " + raftResponse.isSuccessful + ", leaderId: " + raftResponse.leaderId);
     } else {
       response.end("COMMAND NOT RECOGNIZED");
@@ -46,7 +32,7 @@ http.createServer(function (request, response) {
 // Drawing stuff
 function drawScreen() {
   clivas.clear();
-  servers.map(function(server) {
+  cluster.servers.map(function(server) {
     firstLine = [
       "Server ",
       server.id,
@@ -94,7 +80,7 @@ setupClock = function(peer) {
   }, CLOCK_INTERVAL_IN_MIL_SEC);
 }
 
-for (var peerIndex in servers) {
-  var peer = servers[peerIndex];
+for (var peerIndex in cluster.servers) {
+  var peer = cluster.servers[peerIndex];
   setupClock(peer)
 }
