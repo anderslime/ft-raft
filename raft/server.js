@@ -17,6 +17,7 @@ Server = (function() {
     this.electionTimeoutMilSec = null;
     this._resetElectionTimer();
     this.heartBeatInterval = null;
+    this.isDown = false;
   };
 
   Server.prototype.nextIndexFor = function(peerId) {
@@ -27,6 +28,16 @@ Server = (function() {
     return this.leaderState.matchIndexFor(peerId);
   };
 
+  Server.prototype.crash = function() {
+    this._becomeFollower();
+    this.isDown = true;
+  };
+
+  Server.prototype.restart = function() {
+    this._resetElectionTimer();
+    this.isDown = false;
+  }
+
   Server.prototype.decrementElectionTimeout = function(milliSeconds) {
     if (this.isLeader()) return;
     this.electionTimeoutMilSec = this.electionTimeoutMilSec - milliSeconds;
@@ -36,6 +47,7 @@ Server = (function() {
   };
 
   Server.prototype.onReceiveClientRequest = function(logEntry) {
+    if (this.isDown) return;
     if (this.isLeader()) {
       this.log.append({"index": logEntry.index, "term": this.currentTerm});
       return {
@@ -63,12 +75,13 @@ Server = (function() {
   };
 
   Server.prototype.onTimeout = function(){
-    if (this.isLeader()) return;
+    if (this.isLeader() || this.isDown) return;
     this._becomeCandidate();
     this._startElection();
   };
 
   Server.prototype.invokeVoteRequest = function(targetPeer) {
+    if (this.isDown) return;
     return targetPeer.onReceiveRequestVote(
       this,
       {
@@ -82,6 +95,7 @@ Server = (function() {
 
   Server.prototype.onReceiveRequestVote = function(sourcePeer, requestVote) {
     this._onRemoteProcedureCall(requestVote);
+    if (this.isDown) return;
 
     if (this._isValidVote(requestVote)) {
       this._voteFor(requestVote.candidateId);
@@ -97,6 +111,7 @@ Server = (function() {
 
   Server.prototype.onReceiveAppendEntries = function(sourcePeer, appendEntries) {
     this._onRemoteProcedureCall(appendEntries);
+    if (this.isDown) return;
     this.votedFor = null;
     this._resetElectionTimer();
     this.state = "follower";
@@ -127,11 +142,13 @@ Server = (function() {
 
   Server.prototype.invokeVoteResponse = function(requestVoteResult) {
     this._onRemoteProcedureCall(requestVoteResult);
+    if (this.isDown) return;
     return requestVoteResult;
   };
 
   Server.prototype.invokeAppendEntriesResponse = function(targetPeerId, appendEntriesResult) {
     this._onRemoteProcedureCall(appendEntriesResult);
+    if (this.isDown) return;
     if(appendEntriesResult.success){
       var matchIndex = Math.max(
         this.leaderState.matchIndexFor(targetPeerId),
@@ -147,6 +164,7 @@ Server = (function() {
   };
 
   Server.prototype.invokeAppendEntries = function(targetPeer) {
+    if (this.isDown) return;
     var prevLogIndex = this.leaderState.nextIndexFor(targetPeer.id) - 1;
     return targetPeer.onReceiveAppendEntries(
       this,
