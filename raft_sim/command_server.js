@@ -15,7 +15,7 @@ module.exports.startServer = function(cluster) {
       cluster.restart(parseInt(query.serverId))
       response.end("RESTARTING SERVER " + query.serverId + "\n");
     } else if (query.command === 'request' && query.value) {
-      cluster.request(parseInt(query.serverId), query.value)
+      var raftResponse = cluster.request(parseInt(query.serverId), query.value)
       response.end("SUCCESS: " + raftResponse.isSuccessful + ", leaderId: " + raftResponse.leaderId);
     } else {
       response.end("COMMAND NOT RECOGNIZED");

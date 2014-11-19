@@ -5,8 +5,10 @@ var command_server = require('./raft_sim/command_server');
 
 DRAW_SCREEN_EVERY_MILLI_SECOND = 100;
 
+var numberOfServers = parseInt(process.argv[2]);
+
 // Server simulator visualization
-var cluster = raft.buildCluster(5);
+var cluster = raft.buildCluster(numberOfServers);
 var canvas = new Canvas(cluster);
 canvas.startDrawingEvery(DRAW_SCREEN_EVERY_MILLI_SECOND);
 command_server.startServer(cluster);

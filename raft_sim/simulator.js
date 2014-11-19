@@ -13,8 +13,8 @@ Simulator = (function() {
   };
 
   Simulator.prototype.request = function(serverId, value) {
-    this._serverWithId(serverId) && _serverWithId(serverId).onReceiveClientRequest({
-      "value": query.value
+    return this._serverWithId(serverId) && this._serverWithId(serverId).onReceiveClientRequest({
+      "value": value
     });
   };
 
