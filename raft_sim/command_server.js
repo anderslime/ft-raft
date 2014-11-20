@@ -12,11 +12,14 @@ module.exports.startServer = function(cluster) {
       cluster.restart(parseInt(query.serverId))
       response.end("RESTARTING SERVER " + query.serverId + "\n");
     } else if (query.command === 'request' && query.value) {
-      var raftResponse = cluster.request(parseInt(query.serverId), query.value)
-      response.end("SUCCESS: " + raftResponse.isSuccessful + ", leaderId: " + raftResponse.leaderId);
-    } else {
-      response.end("COMMAND NOT RECOGNIZED");
+      var raftResponse = cluster.request(parseInt(query.serverId), query.value);
+      if (raftResponse) {
+        response.end(
+          "SUCCESS: " + raftResponse.isSuccessful + ", leaderId: " + raftResponse.leaderId
+        );
+      }
     }
+    response.end("Invalid Command or the server does not exist");
   };
 
   http.createServer(function (request, response) {
