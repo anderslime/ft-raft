@@ -7,12 +7,12 @@ ELECTION_TIMER_INTERVAL = [1500, 3000];
 CLOCK_INTERVAL_IN_MIL_SEC = 50;
 
 Server = (function() {
-  function Server(id, state, currentTerm, log) {
+  function Server(id, state, log) {
     this.id = id;
     this.cluster = new Cluster([this]);
     this.state = state || 'follower';
     this.log = log || new Log();
-    this.currentTerm = currentTerm || 0;
+    this.currentTerm = 0;
     this.votedFor = null;
     this.leaderState = new LeaderState(this._lastLogIndex());
     this.electionTimeoutMilSec = null;
