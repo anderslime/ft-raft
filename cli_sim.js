@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // Node modules
 var cli = require('optimist');
 
