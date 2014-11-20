@@ -22,15 +22,19 @@ Canvas = (function() {
   };
 
   Canvas.prototype._serverLine = function(server) {
+    var votingString = server.votedFor ? " votedFor: " + server.votedFor : "";
     return [
       "Server ",
       server.id,
+      " currentTerm: ",
+      server.currentTerm,
       " lastLogIndex: ",
       server._lastLogIndex(),
       " ('",
       this._inColor(this._serverColor(server), server.state),
       "'): ",
       server.electionTimeoutMilSec,
+      votingString
     ].join("")
   };
 
