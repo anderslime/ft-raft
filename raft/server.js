@@ -1,6 +1,7 @@
 var Log = require('./log');
 var Cluster = require('./cluster');
 var LeaderState = require('./leader_state');
+var ObjectCommunication = require('./object_communication');
 
 DEFAULT_HEART_BEAT_INTERVAL = 500;
 DEFAULT_ELECTION_TIMER_INTERVAL = [1500, 3000];
@@ -10,9 +11,11 @@ Server = (function() {
     if (options === undefined) options = {};
     this.heartBeatInterval = options.heartBeatInterval || DEFAULT_ELECTION_TIMER_INTERVAL
     this.electionTimerInterval = options.electionTimerInterval || DEFAULT_ELECTION_TIMER_INTERVAL
+    this.protocol = options.protocol || new ObjectCommunication();
     this.clock_interval
     this.id = id;
     this.cluster = new Cluster([this]);
+    this.protocol.cluster = this.cluster;
     this.state = state || 'follower';
     this.log = log || new Log();
     this.currentTerm = 0;
@@ -26,6 +29,7 @@ Server = (function() {
     this.electionTimer = setInterval(function() {
       _me.decrementElectionTimeout(1);
     }, 1);
+    this.votes = [];
   };
 
   Server.prototype.nextIndexFor = function(peerId) {
@@ -90,8 +94,9 @@ Server = (function() {
 
   Server.prototype.invokeVoteRequest = function(targetPeer) {
     if (this.isDown) return;
-    return targetPeer.onReceiveRequestVote(
-      this,
+    return this.protocol.invokeVoteRequest(
+      this.id,
+      targetPeer.id,
       {
         "term": this.currentTerm,
         "candidateId": this.id,
@@ -101,23 +106,25 @@ Server = (function() {
     )
   };
 
-  Server.prototype.onReceiveRequestVote = function(sourcePeer, requestVote) {
+  Server.prototype.onReceiveRequestVote = function(sourcePeerId, requestVote) {
     this._onRemoteProcedureCall(requestVote);
     if (this.isDown) return;
-
-    if (this._isValidVote(requestVote)) {
-      this._voteFor(requestVote.candidateId);
-      return sourcePeer.invokeVoteResponse(
+    var _me = this;
+    if (_me._isValidVote(requestVote)) {
+      _me._voteFor(requestVote.candidateId);
+      return this.protocol.invokeVoteResponse(
+        sourcePeerId,
         { "term": requestVote.term, "voteGranted": true }
       );
     } else {
-      return sourcePeer.invokeVoteResponse(
-        { "term": this.currentTerm, "voteGranted": false }
+      return this.protocol.invokeVoteResponse(
+        sourcePeerId,
+        { "term": _me.currentTerm, "voteGranted": false }
       );
     }
   };
 
-  Server.prototype.onReceiveAppendEntries = function(sourcePeer, appendEntries) {
+  Server.prototype.onReceiveAppendEntries = function(sourcePeerId, appendEntries) {
     this._onRemoteProcedureCall(appendEntries);
     if (this.isDown) return;
     this.votedFor = null;
@@ -127,7 +134,8 @@ Server = (function() {
       this._deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex);
     }
     this.log.append(appendEntries.entries);
-    return sourcePeer.invokeAppendEntriesResponse(
+    return this.protocol.invokeAppendEntriesResponse(
+      sourcePeerId,
       this.id,
       {
         "term": this.currentTerm,
@@ -151,6 +159,8 @@ Server = (function() {
   Server.prototype.invokeVoteResponse = function(requestVoteResult) {
     this._onRemoteProcedureCall(requestVoteResult);
     if (this.isDown) return;
+    this.votes.push(requestVoteResult);
+    this._becomeLeaderIfMajorityOfVotesReceived(this.votes);
     return requestVoteResult;
   };
 
@@ -174,8 +184,9 @@ Server = (function() {
   Server.prototype.invokeAppendEntries = function(targetPeer) {
     if (this.isDown) return;
     var prevLogIndex = this.leaderState.nextIndexFor(targetPeer.id) - 1;
-    return targetPeer.onReceiveAppendEntries(
-      this,
+    return this.protocol.invokeAppendEntries(
+      this.id,
+      targetPeer.id,
       {
         "term": this.currentTerm,
         "leaderId": this.id,
@@ -216,6 +227,7 @@ Server = (function() {
   Server.prototype._onRemoteProcedureCall = function(rpc) {
     if (rpc.term > this.currentTerm) {
       this.currentTerm = rpc.term;
+      this.votedFor = null;
       this._becomeFollower();
     }
   };
@@ -244,12 +256,12 @@ Server = (function() {
   };
 
   Server.prototype._startElection = function() {
+    this.votes = [];
     this.currentTerm += 1;
     this.votedFor = this.id;
     this._resetElectionTimer();
     var _me = this;
-    var voteResponses = this._collectVotesFromOtherPeers();
-    this._becomeLeaderIfMajorityOfVotesReceived(voteResponses);
+    this._collectVotesFromOtherPeers();
   };
 
   Server.prototype._resetElectionTimer = function() {

@@ -23,6 +23,17 @@ Cluster = (function() {
     return leader;
   };
 
+  Cluster.prototype.findPeer = function(peerId) {
+    var peer = {};
+    for (var peerIndex in this.peers) {
+      var nextPeer = this.peers[peerIndex];
+      if (nextPeer.id === peerId) {
+        peer = nextPeer;
+      }
+    }
+    return peer;
+  };
+
   Cluster.prototype.isLargerThanMajority = function(amount) {
     return amount >= this.peerMajoritySize();
   };
