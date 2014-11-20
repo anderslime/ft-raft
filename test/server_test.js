@@ -18,6 +18,7 @@ describe("Rules for Followers", function() {
     it("responds to RequestVote RPCs from candidate", function() {
       var server1 = new Server(1, 'follower');
       var server2 = new Server(2, 'candidate');
+      updatePeers([server1, server2]);
       response = server2.invokeVoteRequest(server1);
       assert.isNotNull(response);
     });
@@ -25,6 +26,7 @@ describe("Rules for Followers", function() {
     it("responds to AppendEntries RPC from leader", function() {
       var server1 = new Server(1, 'leader');
       var server2 = new Server(2, 'follower');
+      updatePeers([server1, server2]);
       response = server1.invokeVoteRequest(server2);
       assert.isNotNull(response);
     });
@@ -43,7 +45,7 @@ describe("Rules for Candidates", function() {
     it("votes for self", function() {
       var server1 = new Server(1, 'follower');
       var server2 = new Server(2, 'follower');
-      updatePeers([server1, server2])
+      updatePeers([server1, server2]);
       server2.votedFor = 2;
       server1.onTimeout();
       assert.equal(server1.votedFor, 1)
@@ -58,6 +60,7 @@ describe("Rules for Candidates", function() {
         var server1 = new Server(1, 'candidate');
         server1.currentTerm = 1;
         var server2 = new Server(2, 'follower');
+        updatePeers([server1, server2]);
         var voteResponse = server1.invokeVoteRequest(server2);
         assert.equal(voteResponse.term, 1);
         assert.equal(voteResponse.voteGranted, true);
@@ -70,6 +73,7 @@ describe("Rules for Candidates", function() {
         server1.currentTerm = 1;
         var server2 = new Server(2, 'follower');
         server2.currentTerm = 2;
+        updatePeers([server1, server2]);
         var voteResponse = server1.invokeVoteRequest(server2);
         assert.equal(voteResponse.term, 2);
         assert.equal(voteResponse.voteGranted, false);
@@ -82,6 +86,7 @@ describe("Rules for Candidates", function() {
         server1.currentTerm = 1;
         var server2 = new Server(2, 'follower');
         server2.currentTerm = 2;
+        updatePeers([server1, server2]);
         var voteResponse = server1.invokeVoteRequest(server2);
         assert.equal(voteResponse.voteGranted, false);
         assert.equal(server1.state, 'follower');
@@ -94,6 +99,7 @@ describe("Rules for Candidates", function() {
         var server1 = new Server(1, 'candidate');
         var server2 = new Server(2, 'follower');
         server2.votedFor = 3;
+        updatePeers([server1, server2]);
         var voteResponse = server1.invokeVoteRequest(server2);
         assert.equal(voteResponse.voteGranted, false);
       });
@@ -106,6 +112,7 @@ describe("Rules for Candidates", function() {
         server1.log = new Log([{"index": 1, "term": 1}]);
         var server2 = new Server(2, 'follower');
         server2.currentTerm = 2;
+        updatePeers([server1, server2]);
         server2.log = new Log([{"index": 1, "term": 1}, {"index": 5, "term": 2}]);
         var voteResponse = server1.invokeVoteRequest(server2);
         assert.equal(voteResponse.voteGranted, false);
