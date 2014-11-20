@@ -6,7 +6,7 @@ var raft = {};
 raft.buildCluster = function(clusterSize) {
   if (clusterSize === undefined) throw new Exception("Missing clusterSize");
   return new Simulator(raft._range(clusterSize).map(function(index) {
-    return new Server(index + 1, [], 'follower');
+    return new Server(index + 1, 'follower');
   }));
 };
 

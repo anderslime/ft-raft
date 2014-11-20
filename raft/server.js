@@ -7,9 +7,9 @@ ELECTION_TIMER_INTERVAL = [1500, 3000];
 CLOCK_INTERVAL_IN_MIL_SEC = 50;
 
 Server = (function() {
-  function Server(id, peers, state, currentTerm, log) {
+  function Server(id, state, currentTerm, log) {
     this.id = id;
-    this.cluster = new Cluster(peers.concat(this));
+    this.cluster = new Cluster([this]);
     this.state = state || 'follower';
     this.log = log || new Log();
     this.currentTerm = currentTerm || 0;
