@@ -12,7 +12,7 @@ var command_server = require('../raft_sim/command_server');
 process.title = 'raft';
 
 // Helper methods
-var parseElectionTimerInterval = function(intervalString) {
+var parseInterval = function(intervalString) {
   return intervalString.split('-').map(function(n) { return parseInt(n) });
 };
 
@@ -32,6 +32,9 @@ var argv = cli.usage("Usage: raftserver [options]")
   .alias('e', 'election-timer')
     .describe('e', 'election timer interval in milli seconds')
     .default('e', '1500-3000')
+  .alias('d', 'rpc-delay')
+    .describe('d', "simulated delay between rpc's in ms")
+    .default('d', '10-20')
   .alias('h', 'help')
     .describe("h", "See help description")
   .argv;
@@ -44,7 +47,9 @@ if (argv.h) {
 var options = {
   clusterSize: argv['servers'],
   heartBeatInterval: parseInt(argv['hearbeat']),
-  electionTimerInterval: parseElectionTimerInterval(argv['election-timer'])
+  minRPCDelay: parseInterval(argv['rpc-delay'])[0],
+  maxRPCDelay: parseInterval(argv['rpc-delay'])[1],
+  electionTimerInterval: parseInterval(argv['election-timer'])
 };
 
 
@@ -59,6 +64,8 @@ console.log(
     options.electionTimerInterval[1] +
     " ms"
 );
+console.log("RPC Delay: between " + options.minRPCDelay +
+            " and " + options.maxRPCDelay + " ms");
 console.log("-------------------------------------------------");
 
 var cluster = raft.buildCluster(options);

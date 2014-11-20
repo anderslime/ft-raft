@@ -1,4 +1,5 @@
 var server = require('./raft/server')
+var ObjectCommunication = require('./raft/object_communication')
 var Simulator = require('./raft_sim/simulator')
 
 var raft = {};
@@ -6,6 +7,7 @@ var raft = {};
 raft.buildCluster = function(options) {
   var clusterSize = options.clusterSize;
   return new Simulator(raft._range(clusterSize).map(function(index) {
+    options.protocol = new ObjectCommunication(null, options);
     return new Server(index + 1, 'follower', null, options);
   }));
 };
