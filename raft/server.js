@@ -2,12 +2,15 @@ var Log = require('./log');
 var Cluster = require('./cluster');
 var LeaderState = require('./leader_state');
 
-HEART_BEAT_INTERVAL_IN_MILLI_SECONDS = 500;
-ELECTION_TIMER_INTERVAL = [1500, 3000];
-CLOCK_INTERVAL_IN_MIL_SEC = 50;
+DEFAULT_HEART_BEAT_INTERVAL = 500;
+DEFAULT_ELECTION_TIMER_INTERVAL = [1500, 3000];
 
 Server = (function() {
-  function Server(id, state, log) {
+  function Server(id, state, log, options) {
+    if (options === undefined) options = {};
+    this.heartBeatIntervalMillSeconds = options.heartBeatIntervalMillSeconds || DEFAULT_ELECTION_TIMER_INTERVAL
+    this.electionTimerInterval = options.electionTimerInterval || DEFAULT_ELECTION_TIMER_INTERVAL
+    this.clock_interval
     this.id = id;
     this.cluster = new Cluster([this]);
     this.state = state || 'follower';
@@ -21,8 +24,8 @@ Server = (function() {
     this.isDown = false;
     var _me = this;
     this.electionTimer = setInterval(function() {
-      _me.decrementElectionTimeout(CLOCK_INTERVAL_IN_MIL_SEC);
-    }, CLOCK_INTERVAL_IN_MIL_SEC);
+      _me.decrementElectionTimeout(1);
+    }, 1);
   };
 
   Server.prototype.nextIndexFor = function(peerId) {
@@ -251,8 +254,8 @@ Server = (function() {
 
   Server.prototype._resetElectionTimer = function() {
     this.electionTimeoutMilSec = this._randomNumberBetween(
-      ELECTION_TIMER_INTERVAL[0],
-      ELECTION_TIMER_INTERVAL[1]
+      this.electionTimerInterval[0],
+      this.electionTimerInterval[1]
     )
   };
 
@@ -305,7 +308,7 @@ Server = (function() {
     this.leaderState = new LeaderState(this._lastLogIndex());
     this.heartBeatInterval = setInterval(function() {
       _me._invokeAppendEntriesOnPeers();
-    }, HEART_BEAT_INTERVAL_IN_MILLI_SECONDS);
+    }, this.heartBeatIntervalMillSeconds);
   };
 
   Server.prototype._invokeAppendEntriesOnPeers = function() {
