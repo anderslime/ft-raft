@@ -22,17 +22,24 @@ DEFAULT_AMOUNT_OF_SERVERS      = 5;
 DEFAULT_HEARTBEAT_INTERVAL     = 500; // ms
 DEFAULT_ELECTION_TIMER_INTERVAL = '1500-3000';
 
-var argv = cli.usage("Usage: $0 [options]")
+var argv = cli.usage("Usage: raftserver [options]")
   .alias('n', 'servers')
     .describe('n', 'number of servers')
     .default('n', 5)
-  .alias('h', 'hearbeat')
-    .describe('h', 'number of milli seconds between heatbeats')
-    .default('h', 200)
+  .alias('b', 'hearbeat')
+    .describe('b', 'number of milli seconds between heatbeats')
+    .default('b', 200)
   .alias('e', 'election-timer')
-    .describe('e', 'election timer interval in milli seconds. given as hyphen seperated values e.g. 500-1000')
+    .describe('e', 'election timer interval in milli seconds')
     .default('e', '1500-3000')
+  .alias('h', 'help')
+    .describe("h", "See help description")
   .argv;
+
+if (argv.h) {
+  cli.showHelp();
+  process.exit(0);
+}
 
 var options = {
   clusterSize: argv['servers'],

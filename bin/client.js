@@ -15,15 +15,29 @@ var randomValue = function() {
 
 // Options
 var argv = cli.usage("Usage: raftclient <command> <server-id>")
-  .demand(2)
   .alias('v', 'value')
     .describe('v', 'value to append to log')
     .default('v', randomValue())
   .argv;
 
+var command = argv._[0];
+var serverId = argv._[1];
+
+if (!command || !serverId) {
+  console.log("You need to specify <command> and <serverId>");
+  console.log("Example: raftclient crash 5")
+  console.log();
+  console.log("List of commands:");
+  console.log("  crash, restart, request");
+  console.log();
+  console.log();
+  cli.showHelp();
+  process.exit(0);
+}
+
 var data = querystring.stringify({
-  command: argv._[0],
-  serverId: argv._[1],
+  command: command,
+  serverId: serverId,
   value: argv.v
 });
 
