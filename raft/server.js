@@ -1,7 +1,7 @@
 var Log = require('./log');
 var Cluster = require('./cluster');
 var LeaderState = require('./leader_state');
-var ObjectCommunication = require('./object_communication');
+var ObjectCommunication = require('./protocol/object_communication');
 
 DEFAULT_HEART_BEAT_INTERVAL = 500;
 DEFAULT_ELECTION_TIMER_INTERVAL = [1500, 3000];
