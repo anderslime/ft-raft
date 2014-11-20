@@ -38,13 +38,19 @@ To see the different possibilities of configure the server, see help by typing:
 To manipulate with the simulation, you can use the `raftclient` command.
 
 To **crash** server with id 3, type:
-`raftclient crash 3`
+```
+raftclient crash 3
+```
 
-To **restart* server with id 4, type:
-`raftclient restart 4`
+To **restart** server with id 4, type:
+```
+raftclient restart 4
+```
 
 To **send a request** with the value '1337' to server with id 2, type:
-`raftclient request 2 1337`
+```
+raftclient request 2 1337
+```
 
 ## Tests
 
