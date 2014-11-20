@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "description": "Fault-Tolerant Raft",
   "bin": {
-    "raft": "./cli_sim.js"
+    "raftserver": "./bin/server.js",
+    "raftclient": "./bin/client.js"
   },
   "keywords": "raft fault-tolerance",
   "homepage": "https://github.com/anderslime/ft-raft",
@@ -19,7 +20,9 @@
   ],
   "dependencies": {
     "optimist": "^0.6.1",
-    "clivas": "^0.1.4"
+    "clivas": "^0.1.4",
+    "http": "*",
+    "querystring": "*"
   },
   "devDependencies": {
     "chai": "*",
