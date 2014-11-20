@@ -1,5 +1,5 @@
 var server = require('./raft/server')
-var ObjectCommunication = require('./raft/protocol/object_communication')
+var ObjectCommunication = require('./raft/protocol/direct_async')
 var Simulator = require('./raft_sim/simulator')
 
 var raft = {};
