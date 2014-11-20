@@ -1,7 +1,7 @@
 var Log = require('./log');
 var Cluster = require('./cluster');
 var LeaderState = require('./leader_state');
-var ObjectCommunication = require('./protocol/direct_async');
+var DirectAsync = require('./protocol/direct_async');
 
 DEFAULT_HEART_BEAT_INTERVAL = 500;
 DEFAULT_ELECTION_TIMER_INTERVAL = [1500, 3000];
@@ -11,7 +11,7 @@ Server = (function() {
     if (options === undefined) options = {};
     this.heartBeatInterval = options.heartBeatInterval || DEFAULT_ELECTION_TIMER_INTERVAL
     this.electionTimerInterval = options.electionTimerInterval || DEFAULT_ELECTION_TIMER_INTERVAL
-    this.protocol = options.protocol || new ObjectCommunication();
+    this.protocol = options.protocol || new DirectAsync();
     this.clock_interval
     this.id = id;
     this.cluster = new Cluster([this]);

@@ -1,5 +1,5 @@
 var server = require('./raft/server')
-var ObjectCommunication = require('./raft/protocol/direct_async')
+var DirectAsync = require('./raft/protocol/direct_async')
 var Simulator = require('./raft_sim/simulator')
 
 var raft = {};
@@ -7,7 +7,7 @@ var raft = {};
 raft.buildCluster = function(options) {
   var clusterSize = options.clusterSize;
   return new Simulator(raft._range(clusterSize).map(function(index) {
-    options.protocol = new ObjectCommunication(null, options);
+    options.protocol = new DirectAsync(null, options);
     return new Server(index + 1, 'follower', null, options);
   }));
 };
