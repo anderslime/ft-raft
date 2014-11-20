@@ -36,7 +36,7 @@ var argv = cli.usage("Usage: $0 [options]")
 
 var options = {
   clusterSize: argv['servers'],
-  heartBeatInterval: argv['hearbeat'],
+  heartBeatInterval: parseInt(argv['hearbeat']),
   electionTimerInterval: parseElectionTimerInterval(argv['election-timer'])
 };
 
