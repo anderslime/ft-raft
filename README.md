@@ -30,7 +30,7 @@ raftserver
 
 This will start the raft simulation and visualize the different servers and their latest log entries.
 
-!(ft-raft)[https://raw.githubusercontent.com/anderslime/ft-raft/master/screenshot.png]
+![raft](https://raw.githubusercontent.com/anderslime/ft-raft/master/screenshot.png)
 
 
 
