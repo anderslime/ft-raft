@@ -8,7 +8,7 @@ DEFAULT_ELECTION_TIMER_INTERVAL = [1500, 3000];
 Server = (function() {
   function Server(id, state, log, options) {
     if (options === undefined) options = {};
-    this.heartBeatIntervalMillSeconds = options.heartBeatIntervalMillSeconds || DEFAULT_ELECTION_TIMER_INTERVAL
+    this.heartBeatInterval = options.heartBeatInterval || DEFAULT_ELECTION_TIMER_INTERVAL
     this.electionTimerInterval = options.electionTimerInterval || DEFAULT_ELECTION_TIMER_INTERVAL
     this.clock_interval
     this.id = id;
@@ -20,7 +20,7 @@ Server = (function() {
     this.leaderState = new LeaderState(this._lastLogIndex());
     this.electionTimeoutMilSec = null;
     this._resetElectionTimer();
-    this.heartBeatInterval = null;
+    this.heartBeat = null;
     this.isDown = false;
     var _me = this;
     this.electionTimer = setInterval(function() {
@@ -293,12 +293,12 @@ Server = (function() {
 
   Server.prototype._becomeCandidate = function() {
     this.state = 'candidate';
-    clearTimeout(this.heartBeatInterval);
+    clearTimeout(this.heartBeat);
   };
 
   Server.prototype._becomeFollower = function() {
     this.state = 'follower';
-    clearTimeout(this.heartBeatInterval);
+    clearTimeout(this.heartBeat);
   };
 
   Server.prototype._becomeLeader = function() {
@@ -306,9 +306,9 @@ Server = (function() {
     this.votedFor = null;
     var _me = this;
     this.leaderState = new LeaderState(this._lastLogIndex());
-    this.heartBeatInterval = setInterval(function() {
+    this.heartBeat = setInterval(function() {
       _me._invokeAppendEntriesOnPeers();
-    }, this.heartBeatIntervalMillSeconds);
+    }, this.heartBeatInterval);
   };
 
   Server.prototype._invokeAppendEntriesOnPeers = function() {

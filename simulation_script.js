@@ -1,14 +1,58 @@
-var EventEmitter = require("events").EventEmitter;
+// Node modules
+var cli = require('optimist');
+
+// Internal modules
 var raft = require('./raft');
 var Canvas = require('./raft_sim/canvas');
 var command_server = require('./raft_sim/command_server');
 
-DRAW_SCREEN_EVERY_MILLI_SECOND = 100;
+// Setup
+process.title = 'raft';
 
-var numberOfServers = parseInt(process.argv[2]);
+// Helper methods
+var parseElectionTimerInterval = function(intervalString) {
+  return intervalString.split('-').map(function(n) { return parseInt(n) });
+};
+
+// Options
+DRAW_SCREEN_EVERY_MILLI_SECOND = 100;
+DEFAULT_AMOUNT_OF_SERVERS      = 5;
+DEFAULT_HEARTBEAT_INTERVAL     = 500; // ms
+DEFAULT_ELECTION_TIMER_INTERVAL = '1500-3000';
+
+var argv = cli.usage("Usage: $0 [options]")
+  .alias('n', 'servers')
+    .describe('n', 'number of servers')
+    .default('n', 5)
+  .alias('h', 'hearbeat')
+    .describe('h', 'number of milli seconds between heatbeats')
+    .default('h', 200)
+  .alias('e', 'election-timer')
+    .describe('e', 'election timer interval in milli seconds. given as hyphen seperated values e.g. 500-1000')
+    .default('e', '1500-3000')
+  .argv;
+
+var options = {
+  clusterSize: argv['servers'],
+  heartBeatInterval: argv['hearbeat'],
+  electionTimerInterval: parseElectionTimerInterval(argv['election-timer'])
+};
+
+
 
 // Server simulator visualization
-var cluster = raft.buildCluster(numberOfServers);
+console.log("----------------- Starting raft -----------------");
+console.log("Heartbeat: every " + options.heartBeatInterval + " ms");
+console.log(
+  "Election timeout: between " +
+    options.electionTimerInterval[0] +
+    " and " +
+    options.electionTimerInterval[1] +
+    " ms"
+);
+console.log("-------------------------------------------------");
+
+var cluster = raft.buildCluster(options);
 var canvas = new Canvas(cluster);
 canvas.startDrawingEvery(DRAW_SCREEN_EVERY_MILLI_SECOND);
 command_server.startServer(cluster);

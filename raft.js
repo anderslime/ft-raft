@@ -3,10 +3,10 @@ var Simulator = require('./raft_sim/simulator')
 
 var raft = {};
 
-raft.buildCluster = function(clusterSize) {
-  if (clusterSize === undefined) throw new Exception("Missing clusterSize");
+raft.buildCluster = function(options) {
+  var clusterSize = options.clusterSize;
   return new Simulator(raft._range(clusterSize).map(function(index) {
-    return new Server(index + 1, 'follower');
+    return new Server(index + 1, 'follower', null, options);
   }));
 };
 
