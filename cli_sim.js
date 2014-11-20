@@ -43,7 +43,7 @@ var options = {
 
 
 // Server simulator visualization
-console.log("----------------- Starting raft -----------------");
+console.log("----------------- Starting Raft -----------------");
 console.log("Heartbeat: every " + options.heartBeatInterval + " ms");
 console.log(
   "Election timeout: between " +
