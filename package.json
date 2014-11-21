@@ -21,8 +21,7 @@
   "dependencies": {
     "optimist": "^0.6.1",
     "clivas": "^0.1.4",
-    "http": "*",
-    "querystring": "*"
+    "querystring": "^0.2.0"
   },
   "devDependencies": {
     "chai": "*",
