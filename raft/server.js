@@ -158,7 +158,7 @@ Server = (function() {
 
   Server.prototype.invokeVoteResponse = function(requestVoteResult) {
     this._onRemoteProcedureCall(requestVoteResult);
-    if (this.isDown) return;
+    if (this.isDown || this.isLeader()) return;
     this.votes.push(requestVoteResult);
     this._becomeLeaderIfMajorityOfVotesReceived(this.votes);
     return requestVoteResult;
