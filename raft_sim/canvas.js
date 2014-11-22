@@ -20,6 +20,7 @@ Canvas = (function() {
     this.cluster.servers.map(function(server) {
       clivas.line(_me._serverLine(server));
       clivas.line(_me._logLine(server));
+      // clivas.line("{50:hey}lulz");
     });
   };
 
@@ -35,6 +36,7 @@ Canvas = (function() {
       "RPC Delay: between " + this.options.minRPCDelay +
         " and " + this.options.maxRPCDelay + " ms"
     );
+    // clivas.line("{12:{yellow:hey}}lulz")
     clivas.line("-------------------------------------------------");
   };
 
@@ -43,27 +45,19 @@ Canvas = (function() {
     return [
       "Server ",
       server.id,
-      " currentTerm: ",
-      server.currentTerm,
-      " lastLogIndex: ",
-      server._lastLogIndex(),
-      " ('",
-      this._inColor(this._serverColor(server), server.state),
-      "'): ",
-      server.electionTimeoutMilSec,
+      " {11+"+this._serverColor(server)+":(" + server.state + ")}",
+      " {8:term: "+server.currentTerm+"}",
+      " {13:logEntries: "+server.log.length()+"}",
+      " {6:"+server.electionTimeoutMilSec+"}",
       votingString
-    ].join("")
+    ].join("");
   };
 
   Canvas.prototype._logLine = function(server) {
     puncuations = server.log.length() > 5 ? '... ' : '';
     return "[" + puncuations + server.log.logEntries.slice(-5).map(function(logEntry) {
-      return ["v->", logEntry.value,", t->", logEntry.term].join("")
+      return ["{magenta:v->", logEntry.value,", t->", logEntry.term, "}"].join("")
     }).join("], [") + "]"
-  };
-
-  Canvas.prototype._inColor = function(color, text) {
-    return "{"+color+":"+text+"}";
   };
 
   Canvas.prototype._serverColor = function(server) {
