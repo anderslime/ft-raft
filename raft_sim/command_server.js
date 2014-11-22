@@ -11,8 +11,8 @@ module.exports.startServer = function(cluster) {
     } else if (query.command === 'restart' && query.serverId) {
       cluster.restart(parseInt(query.serverId))
       response.end("RESTARTING SERVER " + query.serverId + "\n");
-    } else if (query.command === 'request' && query.value) {
-      var raftResponse = cluster.request(parseInt(query.serverId), query.value);
+    } else if (query.command === 'entry' && query.value) {
+      var raftResponse = cluster.appendEntry(parseInt(query.serverId), query.value);
       if (raftResponse) {
         response.end(
           "SUCCESS: " + raftResponse.isSuccessful + ", leaderId: " + raftResponse.leaderId

@@ -12,7 +12,7 @@ Simulator = (function() {
     this._serverWithId(serverId) && this._serverWithId(serverId).restart();
   };
 
-  Simulator.prototype.request = function(serverId, value) {
+  Simulator.prototype.appendEntry = function(serverId, value) {
     return this._serverWithId(serverId) && this._serverWithId(serverId).onReceiveClientRequest({
       "value": value
     });
