@@ -27,10 +27,10 @@
 
 
 \usepackage[english]{babel}
-\usepackage[protrusion=true,expansion=true]{microtype}	
+\usepackage[protrusion=true,expansion=true]{microtype}
 \usepackage{amsmath,amsfonts,amsthm,amssymb}
-\usepackage{graphicx} 
-\usepackage{listings} 
+\usepackage{graphicx}
+\usepackage{listings}
 \usepackage{listings,multicol}
 \graphicspath{{./figures/}}
 \usepackage{caption}
@@ -45,14 +45,14 @@
 \newcommand{\HRule}[1]{\rule{\linewidth}{#1}} 	% Horizontal rule
 
 \makeatletter							% Title
-\def\printtitle{%						
+\def\printtitle{%
     {\centering \@title\par}}
-\makeatother									
+\makeatother
 
 \makeatletter							% Author
-\def\printauthor{%					
-    {\centering \large \@author}}				
-\makeatother							
+\def\printauthor{%
+    {\centering \large \@author}}
+\makeatother
 
 \setlength\parindent{0pt} % Removes all indentation from paragraphs
 \renewcommand{\labelenumi}{\alph{enumi}.} % Make numbering in the enumerate environment by letter rather than number (e.g. section 6)
@@ -92,14 +92,14 @@
 \printauthor								% Print the author data as defined above
 \newpage
 \tableofcontents
-\include{introduction}
-\include{requirements}
-\include{analysis}
-
-\include{design}
-\include{implementation}
-\include{tests}
-\include{conclusion}
+\include{00-preface}
+\include{01-introduction}
+\include{02-requirements}
+\include{03-analysis}
+\include{04-leader_election}
+\include{05-log_replication}
+\include{06-evaluation_tests}
+\include{07-conclusion}
 
 \bibliography{references}{}
 \bibliographystyle{plain}
