@@ -43,8 +43,7 @@ Canvas = (function() {
   Canvas.prototype._serverLine = function(server) {
     var votingString = server.votedFor ? " votedFor: " + server.votedFor : "";
     return [
-      "Server ",
-      server.id,
+      "{9:Server "+server.id+"}",
       " {11+"+this._serverColor(server)+":(" + server.state + ")}",
       " {8:term: "+server.currentTerm+"}",
       " {13:logEntries: "+server.log.length()+"}",
