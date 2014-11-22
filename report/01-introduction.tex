@@ -1,4 +1,6 @@
-\section{Introduction}
+\section{Introduction} % (fold)
+\label{sec:introduction}
+
 This the final report for a project done in the course "Fault tolerant systems" 02228. The purpose of this report is to document an implementation of a consensus algorithm i.e. Raft. \\
 Starting, the fundamental problem when talking about consensus in a distributed system, will be presented. This will then present the motivation behind the project itself. As many solutions to this problem already exists, it should also be discussed why Raft in particular is relevant in the context of this project.
 
@@ -38,7 +40,7 @@ The basic problem of reaching consensus in a distributed network can be illustra
 	\label{generals}
 \end{figure}
 In the figure\ref{generals} below we see two generals of the same army who want to attack an enemy army. But they have to attack at the same time in order to win. They cant communicate directly to each other since they are at different fronts of the battlefield i.e. in the own camps. In the context of a distributed system, the generals here can be seen as two processes trying to agree on a value.
-General 1 then sends out a messenger to tell the second general, that they should attack at dawn. The second general then receives this message, but the first general cannot be sure of this (the messenger might be captured or killed by the 
+General 1 then sends out a messenger to tell the second general, that they should attack at dawn. The second general then receives this message, but the first general cannot be sure of this (the messenger might be captured or killed by the
 enemy on his way to the second general and vice versa). Again, in the context of distributed system, the unreliability of messenger can directly related back to the unreliability of message transmission in a normal distributed system.
 So the second general sends the messenger back in order to acknowledge this. But the first general also has to acknowledge this, resulting in a never ending run for the poor messenger - thus the generals can never agree on when to attack the enemy.
 
@@ -50,4 +52,7 @@ As of writing this report, the most recent proposal to solving the consensus pro
 \item \textbf{Safety}: is ensured by the servers state machine safety property \cite{Raft}. This state machine makes sure that no other server can apply a different command at a given log index, that has already been issued.
 \end{itemize}
 So the basis of this solution is the leader election after which the given leader is responsible to replicate commands it receives from a client to the rest of the network. \\
-It should also be noted that, since Raft relies on majority votes, the algorithm can only uphold these properties in a network of $3F \leq N$, where $F$ is the amount of failures and $N$ is the amount of processes in the system. 
+It should also be noted that, since Raft relies on majority votes, the algorithm can only uphold these properties in a network of $3F \leq N$, where $F$ is the amount of failures and $N$ is the amount of processes in the system.
+
+% section introduction (end)
+
