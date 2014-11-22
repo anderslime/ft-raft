@@ -52,23 +52,8 @@ var options = {
   electionTimerInterval: parseInterval(argv['election-timer'])
 };
 
-
-
 // Server simulator visualization
-console.log("------------------ Running Raft ------------------");
-console.log("Heartbeat: every " + options.heartBeatInterval + " ms");
-console.log(
-  "Election timeout: between " +
-    options.electionTimerInterval[0] +
-    " and " +
-    options.electionTimerInterval[1] +
-    " ms"
-);
-console.log("RPC Delay: between " + options.minRPCDelay +
-            " and " + options.maxRPCDelay + " ms");
-console.log("-------------------------------------------------");
-
 var cluster = raft.buildCluster(options);
-var canvas = new Canvas(cluster);
+var canvas = new Canvas(cluster, options);
 canvas.startDrawingEvery(DRAW_SCREEN_EVERY_MILLI_SECOND);
 command_server.startServer(cluster);

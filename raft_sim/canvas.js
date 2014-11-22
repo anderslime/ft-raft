@@ -1,8 +1,9 @@
 var clivas = require('clivas');
 
 Canvas = (function() {
-  function Canvas(cluster) {
+  function Canvas(cluster, options) {
     this.cluster = cluster;
+    this.options = options;
   };
 
   Canvas.prototype.startDrawingEvery = function(screenDrawInterval) {
@@ -13,12 +14,28 @@ Canvas = (function() {
   };
 
   Canvas.prototype._drawScreen = function() {
-    var _me = this;
     clivas.clear();
+    this._drawConfigurationLine();
+    var _me = this;
     this.cluster.servers.map(function(server) {
       clivas.line(_me._serverLine(server));
       clivas.line(_me._logLine(server));
     });
+  };
+
+  Canvas.prototype._drawConfigurationLine = function(options) {
+    clivas.line("------------------ Running Raft ------------------");
+    clivas.line(
+      "Election timeout: between " + this.options.electionTimerInterval[0] +
+        " and " + this.options.electionTimerInterval[1] +
+        " ms"
+    );
+    clivas.line("Heartbeat: every " + this.options.heartBeatInterval + " ms");
+    clivas.line(
+      "RPC Delay: between " + this.options.minRPCDelay +
+        " and " + this.options.maxRPCDelay + " ms"
+    );
+    clivas.line("-------------------------------------------------");
   };
 
   Canvas.prototype._serverLine = function(server) {
