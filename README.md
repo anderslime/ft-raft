@@ -51,9 +51,9 @@ To **restart** server with id 4, type:
 raftclient restart 4
 ```
 
-To **send a request** with the value '1337' to server with id 2, type:
+To **append an entry** with the value '1337' to server with id 2, type:
 ```
-raftclient request 2 1337
+raftclient entry 2 1337
 ```
 
 ## Tests
