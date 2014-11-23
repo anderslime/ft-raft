@@ -314,6 +314,7 @@ Server = (function() {
   };
 
   Server.prototype._becomeLeader = function() {
+    if (this.isLeader()) return;
     this.state = 'leader';
     this.votedFor = null;
     var _me = this;
