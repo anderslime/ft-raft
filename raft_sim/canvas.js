@@ -20,6 +20,7 @@ Canvas = (function() {
     this.cluster.servers.map(function(server) {
       clivas.line(_me._serverLine(server));
       clivas.line(_me._logLine(server));
+      clivas.line("");
     });
   };
 
