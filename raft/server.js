@@ -339,7 +339,7 @@ Server = (function() {
       return matchIndex !== undefined;
     }).concat(this._lastLogIndex()).sort();
     var N = clusterMatchIndexes[Math.ceil(this.cluster.amountOfPeers() / 2)];
-    if (this.log.entryAt(N) && this.log.entryAt(N).term == this.currentTerm) {
+    if (this.log.entryAt(N) && this.log.entryAt(N).term === this.currentTerm) {
       this.commitIndex = N;
     }
   };

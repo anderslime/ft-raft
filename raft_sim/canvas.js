@@ -46,6 +46,7 @@ Canvas = (function() {
       " {11+"+this._serverColor(server)+":(" + server.state + ")}",
       " {8:term: "+server.currentTerm+"}",
       " {13:logEntries: "+server.log.length()+"}",
+      " {14:commitIndex: "+server.commitIndex+"}",
       " {6:"+server.electionTimeoutMilSec+"}",
       votingString
     ].join("");
@@ -53,9 +54,26 @@ Canvas = (function() {
 
   Canvas.prototype._logLine = function(server) {
     puncuations = server.log.length() > 5 ? '..., ' : '';
-    return "[" + puncuations + server.log.logEntries.slice(-5).map(function(logEntry) {
-      return ["{magenta:v->", logEntry.value,", t->", logEntry.term, "}"].join("")
+    var sliceSize = 5
+    var slicedLog = server.log.logEntries.slice(-sliceSize);
+    var logSize = server.log.length();
+    var _canvas = this;
+    return "[" + puncuations + slicedLog.map(function(logEntry, index) {
+      var entryIndex = slicedLog.length === logSize ? index : logSize - sliceSize + 1;
+      return _canvas._logEntryLine(logEntry, entryIndex, server);
     }).join("], [") + "]"
+  };
+
+  Canvas.prototype._logEntryLine = function(logEntry, entryIndex, server) {
+    return "{" + this._logEntryColor(entryIndex, server) + ":"+
+              "v->" + logEntry.value + ", " +
+              "t->" + logEntry.term +
+           "}"
+  };
+
+  Canvas.prototype._logEntryColor = function(entryIndex, server) {
+    if (server.commitIndex >= entryIndex + 1) return 'grey+bold+underline';
+    return 'grey+italic';
   };
 
   Canvas.prototype._serverColor = function(server) {
