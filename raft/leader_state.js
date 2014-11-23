@@ -32,7 +32,6 @@ LeaderState = ( function(){
     return matchIndex;
   };
 
-
   return LeaderState;
 
 })();
