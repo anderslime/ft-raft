@@ -274,6 +274,39 @@ describe("Rules for Candidates", function() {
       var result = server1.invokeAppendEntries(server2);
       assert.deepEqual(server2.log.logEntries, [{"index": 1, "term": 1}, {"index": 2, "term": 1}]);
     });
+    // Rule 5
+    it("sets commitIndex=leaderCommit if leaderCommit > commitIndex and leaderCommit < index of last new entry", function() {
+      var server1 = new Server(1, 'leader', new Log([{"index": 1, "term": 1}]));
+      server1.currentTerm = 1;
+      server1.commitIndex = 1;
+      var server2 = new Server(2, 'follower', new Log([{"index": 1, "term": 1}, {"index": 1, "term": 1}]));
+      server2.currentTerm = 1;
+      updatePeers([server1, server2]);
+      server1.invokeAppendEntries(server2);
+      assert.equal(server2.commitIndex, 1);
+    });
+    // Rule 5
+    it("sets commitIndex=index of last new entry if leaderCommit > commitIndex and index of last new entry < leaderCommit", function() {
+      var server1 = new Server(1, 'leader', new Log([{"index": 1, "term": 1}, {"index": 1, "term": 1}]));
+      server1.currentTerm = 1;
+      server1.commitIndex = 2;
+      var server2 = new Server(2, 'follower', new Log([{"index": 1, "term": 1}]));
+      server2.currentTerm = 1;
+      updatePeers([server1, server2]);
+      server1.invokeAppendEntries(server2);
+      assert.equal(server2.commitIndex, 1);
+    });
+    // Rule 5
+    it("sets commitIndex=leaderCommit of last new entry if leaderCommit > commitIndex and index of last new entry == leaderCommit", function() {
+      var server1 = new Server(1, 'leader', new Log([{"index": 1, "term": 1}]));
+      server1.currentTerm = 1;
+      server1.commitIndex = 1;
+      var server2 = new Server(2, 'follower', new Log([{"index": 1, "term": 1}]));
+      server2.currentTerm = 1;
+      updatePeers([server1, server2]);
+      server1.invokeAppendEntries(server2);
+      assert.equal(server2.commitIndex, 1);
+    });
   });
 });
 

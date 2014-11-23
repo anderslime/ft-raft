@@ -19,6 +19,7 @@ Server = (function() {
     this.state = state || 'follower';
     this.log = log || new Log();
     this.currentTerm = 0;
+    this.commitIndex = 0;
     this.votedFor = null;
     this.leaderState = new LeaderState(this._lastLogIndex());
     this.electionTimeoutMilSec = null;
@@ -134,6 +135,9 @@ Server = (function() {
       this._deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex);
     }
     this.log.append(appendEntries.entries);
+    if (appendEntries.leaderCommit > this.commitIndex) {
+      this.commitIndex = Math.min(appendEntries.leaderCommit, this._lastLogIndex());
+    }
     return this.protocol.invokeAppendEntriesResponse(
       sourcePeerId,
       this.id,
@@ -193,7 +197,7 @@ Server = (function() {
         "prevLogIndex": prevLogIndex,
         "prevLogTerm": this._termAtLogEntry(prevLogIndex),
         "entries": this._entries(targetPeer),
-        "leaderCommit": null
+        "leaderCommit": this.commitIndex
       }
     )
   };
