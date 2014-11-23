@@ -53,7 +53,11 @@ describe("Rules for Candidates", function() {
     });
 
     it("resets election timer", function() {
-      // TODO: Test this
+      var server1 = new Server(1, 'follower', null, { electionTimerInterval: [500, 500] });
+      clearTimeout(server1.electionTimer);
+      server1.electionTimeoutMilSec = 1000;
+      server1.onTimeout();
+      assert.equal(server1.electionTimeoutMilSec, 500);
     });
 
     describe("sending RequestVote RPCs to all other servers", function() {
@@ -269,12 +273,6 @@ describe("Rules for Candidates", function() {
       updatePeers([server1, server2]);
       var result = server1.invokeAppendEntries(server2);
       assert.deepEqual(server2.log.logEntries, [{"index": 1, "term": 1}, {"index": 2, "term": 1}]);
-    });
-  });
-
-  describe("If election timeout elapses: start new election", function() {
-    it("starts new election on timeout", function() {
-      // TODO: Implement this rule
     });
   });
 });
