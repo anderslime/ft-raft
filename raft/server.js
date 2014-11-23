@@ -324,8 +324,24 @@ Server = (function() {
     this.leaderState = new LeaderState(this._otherPeers(), this._lastLogIndex());
     var _me = this;
     this.heartBeat = setInterval(function() {
-      _me._invokeAppendEntriesOnPeers();
+      _me._onHeartBeat();
     }, this.heartBeatInterval);
+  };
+
+  Server.prototype._onHeartBeat = function() {
+    this._invokeAppendEntriesOnPeers();
+    this._advanceCommitIndex();
+  };
+
+  Server.prototype._advanceCommitIndex = function() {
+    if (!this.isLeader()) return;
+    var clusterMatchIndexes = this.leaderState.matchIndex.filter(function(matchIndex) {
+      return matchIndex !== undefined;
+    }).concat(this._lastLogIndex()).sort();
+    var N = clusterMatchIndexes[Math.ceil(this.cluster.amountOfPeers() / 2)];
+    if (this.log.entryAt(N) && this.log.entryAt(N).term == this.currentTerm) {
+      this.commitIndex = N;
+    }
   };
 
   Server.prototype._invokeAppendEntriesOnPeers = function() {

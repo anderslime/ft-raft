@@ -344,7 +344,7 @@ describe("General rules for servers",function(){
     var response = server1.invokeAppendEntries(server2);
     assert.equal(response.success,true);
     assert.equal(server1.matchIndexFor(server2.id), 2);
-  })
+  });
   it("If AppendEntries fails because of log inconsistency: decrement nextIndex and retry.",function(){
     var server1 = new Server(1, 'leader', new Log([{"index": 1, "term": 2}]));
     server1.currentTerm = 2;
@@ -355,5 +355,32 @@ describe("General rules for servers",function(){
     var response = server1.invokeAppendEntries(server2);
     assert.equal(response.success,false);
     assert.equal(server1.nextIndexFor(2), 1);
-  })
+  });
+  describe("If there exists an N such that N > commitIndex .... (advance commit index)", function() {
+    it("updates commitIndex if majority of servers matches that index", function() {
+      var server1 = new Server(1, 'leader', new Log([{"index": 1, "term": 1}]));
+      var server2 = new Server(2, 'follower', new Log([{"index": 1, "term": 1}]));
+      var server3 = new Server(3, 'follower', new Log([{"index": 1, "term": 1}]));
+      server1.currentTerm = 1;
+      server2.currentTerm = 1;
+      server3.currentTerm = 1;
+      updatePeers([server1, server2, server3]);
+      assert.equal(server1.commitIndex, 0);
+      server1._onHeartBeat();
+      assert.equal(server1.commitIndex, 1)
+    });
+
+    it("does not update commitIndex if majority of servers does not match that index", function() {
+      var server1 = new Server(1, 'leader', new Log([{"index": 1, "term": 1}]));
+      var server2 = new Server(2, 'follower', new Log([]));
+      var server3 = new Server(3, 'follower', new Log([{"index": 1, "term": 1}]));
+      server1.currentTerm = 1;
+      server2.currentTerm = 1;
+      server3.currentTerm = 1;
+      updatePeers([server1, server2, server3]);
+      assert.equal(server1.commitIndex, 0);
+      server1._onHeartBeat();
+      assert.equal(server1.commitIndex, 0)
+    });
+  });
 });
