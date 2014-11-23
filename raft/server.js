@@ -199,7 +199,7 @@ Server = (function() {
   };
 
   Server.prototype._termAtLogEntry = function(entryIndex) {
-    if (entryIndex === 0) return null;
+    if (entryIndex === 0 || this.log.entryAt(entryIndex) === undefined) return null;
     return this.log.entryAt(entryIndex).term
   };
 
