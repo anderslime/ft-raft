@@ -21,7 +21,7 @@ Server = (function() {
     this.currentTerm = 0;
     this.commitIndex = 0;
     this.votedFor = null;
-    this.leaderState = new LeaderState(this._lastLogIndex());
+    this.leaderState = new LeaderState(this._otherPeers(), this._lastLogIndex());
     this.electionTimeoutMilSec = null;
     this._resetElectionTimer();
     this.heartBeat = null;
@@ -321,8 +321,8 @@ Server = (function() {
     if (this.isLeader()) return;
     this.state = 'leader';
     this.votedFor = null;
+    this.leaderState = new LeaderState(this._otherPeers(), this._lastLogIndex());
     var _me = this;
-    this.leaderState = new LeaderState(this._lastLogIndex());
     this.heartBeat = setInterval(function() {
       _me._invokeAppendEntriesOnPeers();
     }, this.heartBeatInterval);

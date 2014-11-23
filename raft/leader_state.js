@@ -1,8 +1,8 @@
 LeaderState = ( function(){
-  function LeaderState(lastLogIndex){
+  function LeaderState(otherPeers, lastLogIndex){
     this.lastLogIndex = lastLogIndex;
-    this.nextIndex = [];
-    this.matchIndex = [];
+    this.nextIndex = this._initialNextIndex(otherPeers, lastLogIndex);
+    this.matchIndex = this._initialMatchIndex(otherPeers);
   };
 
   LeaderState.prototype.nextIndexFor = function(peerIndex) {
@@ -30,6 +30,22 @@ LeaderState = ( function(){
     var matchIndex = this.matchIndex[peerIndex];
     if (matchIndex === undefined) return -1;
     return matchIndex;
+  };
+
+  LeaderState.prototype._initialNextIndex = function(otherPeers, lastLogIndex) {
+    var initialNextIndex = [];
+    otherPeers.forEach(function(peer) {
+      initialNextIndex[peer.id] = lastLogIndex + 1;
+    });
+    return initialNextIndex;
+  };
+
+  LeaderState.prototype._initialMatchIndex = function(otherPeers) {
+    var initialMatchIndex = [];
+    otherPeers.forEach(function(peer) {
+      initialMatchIndex[peer.id] = 0;
+    });
+    return initialMatchIndex;
   };
 
   return LeaderState;
