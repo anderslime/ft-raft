@@ -56,7 +56,7 @@ Canvas = (function() {
   };
 
   Canvas.prototype._logLine = function(server) {
-    puncuations = server.log.length() > 5 ? '... ' : '';
+    puncuations = server.log.length() > 5 ? '..., ' : '';
     return "[" + puncuations + server.log.logEntries.slice(-5).map(function(logEntry) {
       return ["v->", logEntry.value,", t->", logEntry.term].join("")
     }).join("], [") + "]"
