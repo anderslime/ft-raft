@@ -20,7 +20,6 @@ Canvas = (function() {
     this.cluster.servers.map(function(server) {
       clivas.line(_me._serverLine(server));
       clivas.line(_me._logLine(server));
-      // clivas.line("{50:hey}lulz");
     });
   };
 
@@ -36,7 +35,6 @@ Canvas = (function() {
       "RPC Delay: between " + this.options.minRPCDelay +
         " and " + this.options.maxRPCDelay + " ms"
     );
-    // clivas.line("{12:{yellow:hey}}lulz")
     clivas.line("-------------------------------------------------");
   };
 
@@ -53,7 +51,7 @@ Canvas = (function() {
   };
 
   Canvas.prototype._logLine = function(server) {
-    puncuations = server.log.length() > 5 ? '... ' : '';
+    puncuations = server.log.length() > 5 ? '..., ' : '';
     return "[" + puncuations + server.log.logEntries.slice(-5).map(function(logEntry) {
       return ["{magenta:v->", logEntry.value,", t->", logEntry.term, "}"].join("")
     }).join("], [") + "]"
