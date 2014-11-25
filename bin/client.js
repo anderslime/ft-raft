@@ -28,7 +28,7 @@ if (!command || !serverId) {
   console.log("Example: raftclient crash 5")
   console.log();
   console.log("List of commands:");
-  console.log("  crash, restart, request");
+  console.log("  crash, restart, entry");
   console.log();
   console.log();
   cli.showHelp();
