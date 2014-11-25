@@ -185,18 +185,18 @@ Server = (function() {
     return appendEntriesResult;
   };
 
-  Server.prototype.invokeAppendEntries = function(targetPeer) {
+  Server.prototype.invokeAppendEntries = function(targetPeerId) {
     if (this.isDown) return;
-    var prevLogIndex = this.leaderState.nextIndexFor(targetPeer.id) - 1;
+    var prevLogIndex = this.leaderState.nextIndexFor(targetPeerId) - 1;
     return this.protocol.invokeAppendEntries(
       this.id,
-      targetPeer.id,
+      targetPeerId,
       {
         "term": this.currentTerm,
         "leaderId": this.id,
         "prevLogIndex": prevLogIndex,
         "prevLogTerm": this._termAtLogEntry(prevLogIndex),
-        "entries": this._entries(targetPeer),
+        "entries": this._entries(targetPeerId),
         "leaderCommit": this.commitIndex
       }
     )
@@ -207,10 +207,10 @@ Server = (function() {
     return this.log.entryAt(entryIndex).term
   };
 
-  Server.prototype._entries = function(targetPeer) {
-    if (this._lastLogIndex() >= this.leaderState.nextIndexFor(targetPeer.id)) {
+  Server.prototype._entries = function(targetPeerId) {
+    if (this._lastLogIndex() >= this.leaderState.nextIndexFor(targetPeerId)) {
       return this.log.entryRange(
-        this.leaderState.nextIndexFor(targetPeer.id),
+        this.leaderState.nextIndexFor(targetPeerId),
         this._lastLogIndex() + 1
       );
     } else {
@@ -347,7 +347,7 @@ Server = (function() {
   Server.prototype._invokeAppendEntriesOnPeers = function() {
     var _me = this;
     this._otherPeers().map(function(peer) {
-      _me.invokeAppendEntries(peer);
+      _me.invokeAppendEntries(peer.id);
     });
   };
 

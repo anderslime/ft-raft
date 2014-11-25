@@ -191,7 +191,7 @@ describe("Rules for Candidates", function() {
       var server1 = new Server(2, 'leader');
       var server2 = new Server(3, 'candidate');
       updatePeers([server1, server2]);
-      server1.invokeAppendEntries(server2);
+      server1.invokeAppendEntries(server2.id);
       assert.equal(server2.state,'follower');
     });
   });
@@ -203,7 +203,7 @@ describe("Rules for Candidates", function() {
       var server2 = new Server(3, 'candidate');
       server2.currentTerm = 2;
       updatePeers([server1, server2]);
-      var result = server1.invokeAppendEntries(server2);
+      var result = server1.invokeAppendEntries(server2.id);
       assert.equal(result.success, false);
     });
     // Rule 1
@@ -213,7 +213,7 @@ describe("Rules for Candidates", function() {
       var server2 = new Server(3, 'candidate');
       server1.currentTerm = 2;
       updatePeers([server1, server2]);
-      var result = server1.invokeAppendEntries(server2);
+      var result = server1.invokeAppendEntries(server2.id);
       assert.equal(result.success, true);
     });
     // Rule 2
@@ -224,7 +224,7 @@ describe("Rules for Candidates", function() {
       var server2 = new Server(2, 'follower');
       server2.currentTerm = 2;
       updatePeers([server1, server2]);
-      var result = server1.invokeAppendEntries(server2);
+      var result = server1.invokeAppendEntries(server2.id);
       assert.equal(result.success, false);
     });
     // Rule 2
@@ -236,7 +236,7 @@ describe("Rules for Candidates", function() {
       var server2 = new Server(2, 'follower', server2Log);
       server2.currentTerm = 2;
       updatePeers([server1, server2]);
-      var result = server1.invokeAppendEntries(server2);
+      var result = server1.invokeAppendEntries(server2.id);
       assert.equal(result.success, false);
     });
     // Rule 2
@@ -246,7 +246,7 @@ describe("Rules for Candidates", function() {
       var server2 = new Server(2, 'follower');
       server2.log = new Log([{"index": 1, "term": 1}]);
       updatePeers([server1, server2]);
-      var result = server1.invokeAppendEntries(server2);
+      var result = server1.invokeAppendEntries(server2.id);
       assert.equal(result.success, true);
     });
     // Rule 3
@@ -259,7 +259,7 @@ describe("Rules for Candidates", function() {
         var server2 = new Server(2, 'follower', server2Log);
         server2.currentTerm = 2;
         updatePeers([server1, server2]);
-        var result = server1.invokeAppendEntries(server2);
+        var result = server1.invokeAppendEntries(server2.id);
         assert.deepEqual(server2.log.logEntries, [{"index": 1, "term": 1}]);
       });
     });
@@ -271,7 +271,7 @@ describe("Rules for Candidates", function() {
       server2.currentTerm = 2;
       server1.log.append({"index": 2, "term": 1});
       updatePeers([server1, server2]);
-      var result = server1.invokeAppendEntries(server2);
+      var result = server1.invokeAppendEntries(server2.id);
       assert.deepEqual(server2.log.logEntries, [{"index": 1, "term": 1}, {"index": 2, "term": 1}]);
     });
     // Rule 5
@@ -282,7 +282,7 @@ describe("Rules for Candidates", function() {
       var server2 = new Server(2, 'follower', new Log([{"index": 1, "term": 1}, {"index": 1, "term": 1}]));
       server2.currentTerm = 1;
       updatePeers([server1, server2]);
-      server1.invokeAppendEntries(server2);
+      server1.invokeAppendEntries(server2.id);
       assert.equal(server2.commitIndex, 1);
     });
     // Rule 5
@@ -293,7 +293,7 @@ describe("Rules for Candidates", function() {
       var server2 = new Server(2, 'follower', new Log([{"index": 1, "term": 1}]));
       server2.currentTerm = 1;
       updatePeers([server1, server2]);
-      server1.invokeAppendEntries(server2);
+      server1.invokeAppendEntries(server2.id);
       assert.equal(server2.commitIndex, 1);
     });
     // Rule 5
@@ -304,7 +304,7 @@ describe("Rules for Candidates", function() {
       var server2 = new Server(2, 'follower', new Log([{"index": 1, "term": 1}]));
       server2.currentTerm = 1;
       updatePeers([server1, server2]);
-      server1.invokeAppendEntries(server2);
+      server1.invokeAppendEntries(server2.id);
       assert.equal(server2.commitIndex, 1);
     });
   });
@@ -341,7 +341,7 @@ describe("General rules for servers",function(){
     var server2 = new Server(2, 'follower', new Log([{"index": 1, "term": 1},{"index": 1, "term": 1}]));
     server2.currentTerm = 2
     updatePeers([server1, server2]);
-    var response = server1.invokeAppendEntries(server2);
+    var response = server1.invokeAppendEntries(server2.id);
     assert.equal(response.success,true);
     assert.equal(server1.matchIndexFor(server2.id), 2);
   });
@@ -352,7 +352,7 @@ describe("General rules for servers",function(){
     server2.currentTerm = 2;
     updatePeers([server1, server2]);
     assert.equal(server1.nextIndexFor(2), 2);
-    var response = server1.invokeAppendEntries(server2);
+    var response = server1.invokeAppendEntries(server2.id);
     assert.equal(response.success,false);
     assert.equal(server1.nextIndexFor(2), 1);
   });
