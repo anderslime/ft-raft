@@ -3,13 +3,13 @@ var Cluster = require('./cluster');
 var LeaderState = require('./leader_state');
 var DirectAsync = require('./protocol/direct');
 
-DEFAULT_HEART_BEAT_INTERVAL = 500;
+DEFAULT_HEARTBEAT_DELAY = 100;
 DEFAULT_ELECTION_TIMER_INTERVAL = [1500, 3000];
 
 Server = (function() {
   function Server(id, state, log, options) {
     if (options === undefined) options = {};
-    this.heartBeatInterval = options.heartBeatInterval || DEFAULT_ELECTION_TIMER_INTERVAL
+    this.heartbeatDelay = options.heartbeatDelay || DEFAULT_HEARTBEAT_DELAY
     this.electionTimerInterval = options.electionTimerInterval || DEFAULT_ELECTION_TIMER_INTERVAL
     this.protocol = options.protocol || new Direct();
     this.clock_interval
@@ -24,7 +24,6 @@ Server = (function() {
     this.leaderState = new LeaderState(this._otherPeers(), this._lastLogIndex());
     this.electionTimeoutMilSec = null;
     this._resetElectionTimer();
-    this.heartBeat = null;
     this.isDown = false;
     var _me = this;
     this.electionTimer = setInterval(function() {
@@ -182,7 +181,7 @@ Server = (function() {
       this.leaderState.decrementNextIndex(targetPeerId);
     }
     this._advanceCommitIndex();
-    this._invokeDelayedHeartBeatWithPeer(targetPeerId);
+    this._invokeDelayedHeartbeatWithPeer(targetPeerId);
     return appendEntriesResult;
   };
 
@@ -310,12 +309,10 @@ Server = (function() {
 
   Server.prototype._becomeCandidate = function() {
     this.state = 'candidate';
-    clearTimeout(this.heartBeat);
   };
 
   Server.prototype._becomeFollower = function() {
     this.state = 'follower';
-    clearTimeout(this.heartBeat);
   };
 
   Server.prototype._becomeLeader = function() {
@@ -323,7 +320,7 @@ Server = (function() {
     this.state = 'leader';
     this.votedFor = null;
     this.leaderState = new LeaderState(this._otherPeers(), this._lastLogIndex());
-    this._startHeartBeatWithPeers();
+    this._startHeartbeatWithPeers();
   };
 
   Server.prototype._advanceCommitIndex = function() {
@@ -337,18 +334,18 @@ Server = (function() {
     }
   };
 
-  Server.prototype._startHeartBeatWithPeers = function() {
+  Server.prototype._startHeartbeatWithPeers = function() {
     var _me = this;
     this._otherPeers().map(function(peer) {
       _me.invokeAppendEntries(peer.id);
     });
   };
 
-  Server.prototype._invokeDelayedHeartBeatWithPeer = function(peerId) {
+  Server.prototype._invokeDelayedHeartbeatWithPeer = function(peerId) {
     var _me = this;
     setTimeout(function() {
       _me.invokeAppendEntries(peerId);
-    }, this.heartBeatInterval);
+    }, this.heartbeatDelay);
   };
 
   return Server;

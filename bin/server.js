@@ -19,21 +19,21 @@ var parseInterval = function(intervalString) {
 // Options
 DRAW_SCREEN_EVERY_MILLI_SECOND = 100;
 DEFAULT_AMOUNT_OF_SERVERS      = 5;
-DEFAULT_HEARTBEAT_INTERVAL     = 500; // ms
+DEFAULT_HEARTBEAT_DELAY        = 100; // ms
 DEFAULT_ELECTION_TIMER_INTERVAL = '1500-3000';
 
 var argv = cli.usage("Usage: raftserver [options]")
   .alias('n', 'servers')
     .describe('n', 'number of servers')
     .default('n', 5)
-  .alias('b', 'hearbeat')
-    .describe('b', 'number of milli seconds between heatbeats')
+  .alias('b', 'heartbeat-delay')
+    .describe('b', 'number of milliseconds between heatbeats')
     .default('b', 200)
   .alias('e', 'election-timer')
-    .describe('e', 'election timer interval in milli seconds')
+    .describe('e', 'election timer interval in milliseconds')
     .default('e', '1500-3000')
   .alias('d', 'rpc-delay')
-    .describe('d', "simulated delay between rpc's in ms")
+    .describe('d', "simulated delay between rpc's in milliseconds")
     .default('d', '10-20')
   .alias('h', 'help')
     .describe("h", "See help description")
@@ -46,7 +46,7 @@ if (argv.h) {
 
 var options = {
   clusterSize: argv['servers'],
-  heartBeatInterval: parseInt(argv['hearbeat']),
+  heartBeatInterval: parseInt(argv['heartbeat-delay']),
   minRPCDelay: parseInterval(argv['rpc-delay'])[0],
   maxRPCDelay: parseInterval(argv['rpc-delay'])[1],
   electionTimerInterval: parseInterval(argv['election-timer'])
