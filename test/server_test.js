@@ -366,20 +366,22 @@ describe("General rules for servers",function(){
       server3.currentTerm = 1;
       updatePeers([server1, server2, server3]);
       assert.equal(server1.commitIndex, 0);
-      server1._onHeartBeat();
+      server1.invokeAppendEntries(server2.id);
+      server1.invokeAppendEntries(server3.id);
       assert.equal(server1.commitIndex, 1)
     });
 
     it("does not update commitIndex if majority of servers does not match that index", function() {
       var server1 = new Server(1, 'leader', new Log([{"index": 1, "term": 1}]));
       var server2 = new Server(2, 'follower', new Log([]));
-      var server3 = new Server(3, 'follower', new Log([{"index": 1, "term": 1}]));
+      var server3 = new Server(3, 'follower', new Log([]));
       server1.currentTerm = 1;
       server2.currentTerm = 1;
       server3.currentTerm = 1;
       updatePeers([server1, server2, server3]);
       assert.equal(server1.commitIndex, 0);
-      server1._onHeartBeat();
+      server1.invokeAppendEntries(server2.id);
+      server1.invokeAppendEntries(server3.id);
       assert.equal(server1.commitIndex, 0)
     });
   });
