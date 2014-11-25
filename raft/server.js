@@ -340,7 +340,7 @@ Server = (function() {
   Server.prototype._startHeartBeatWithPeers = function() {
     var _me = this;
     this._otherPeers().map(function(peer) {
-      _me._invokeDelayedHeartBeatWithPeer(peer.id)
+      _me.invokeAppendEntries(peer.id);
     });
   };
 
