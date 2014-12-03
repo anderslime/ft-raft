@@ -25,3 +25,5 @@ node_modules/
 *.mtc1
 *.out
 *.synctex.gz
+
+*.pdf
