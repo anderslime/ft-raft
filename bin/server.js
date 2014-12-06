@@ -46,7 +46,7 @@ if (argv.h) {
 
 var options = {
   clusterSize: argv['servers'],
-  heartBeatInterval: parseInt(argv['heartbeat-delay']),
+  heartbeatDelay: parseInt(argv['heartbeat-delay']),
   minRPCDelay: parseInterval(argv['rpc-delay'])[0],
   maxRPCDelay: parseInterval(argv['rpc-delay'])[1],
   electionTimerInterval: parseInterval(argv['election-timer'])

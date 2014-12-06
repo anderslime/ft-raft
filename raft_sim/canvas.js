@@ -31,7 +31,7 @@ Canvas = (function() {
         " and " + this.options.electionTimerInterval[1] +
         " ms"
     );
-    clivas.line("Heartbeat: every " + this.options.heartBeatInterval + " ms");
+    clivas.line("Heartbeat: every " + this.options.heartbeatDelay + " ms");
     clivas.line(
       "RPC Delay: between " + this.options.minRPCDelay +
         " and " + this.options.maxRPCDelay + " ms"

@@ -181,7 +181,6 @@ Server = (function() {
       this.leaderState.decrementNextIndex(targetPeerId);
     }
     this._advanceCommitIndex();
-    this._invokeDelayedHeartbeatWithPeer(targetPeerId);
     return appendEntriesResult;
   };
 
@@ -320,8 +319,19 @@ Server = (function() {
     this.state = 'leader';
     this.votedFor = null;
     this.leaderState = new LeaderState(this._otherPeers(), this._lastLogIndex());
-    this._startHeartbeatWithPeers();
+    this._invokeAppendEntriesOnPeers();
+    var _me = this;
+    this.heartBeat = setInterval(function() {
+      _me._invokeAppendEntriesOnPeers();
+    }, this.heartbeatDelay);
   };
+
+   Server.prototype._invokeAppendEntriesOnPeers = function() {
+     var _me = this;
+     this._otherPeers().map(function(peer) {
+       _me.invokeAppendEntries(peer.id);
+     });
+   };
 
   Server.prototype._advanceCommitIndex = function() {
     if (!this.isLeader()) return;
@@ -332,20 +342,6 @@ Server = (function() {
     if (this.log.entryAt(N) && this.log.entryAt(N).term === this.currentTerm) {
       this.commitIndex = N;
     }
-  };
-
-  Server.prototype._startHeartbeatWithPeers = function() {
-    var _me = this;
-    this._otherPeers().map(function(peer) {
-      _me.invokeAppendEntries(peer.id);
-    });
-  };
-
-  Server.prototype._invokeDelayedHeartbeatWithPeer = function(peerId) {
-    var _me = this;
-    setTimeout(function() {
-      _me.invokeAppendEntries(peerId);
-    }, this.heartbeatDelay);
   };
 
   return Server;
