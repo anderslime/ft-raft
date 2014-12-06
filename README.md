@@ -4,8 +4,6 @@ This project is an implementation of the Raft consens algorithm for the course 0
 
 You can read more about Raft at: [http://raftconsensus.github.io/](http://raftconsensus.github.io)
 
-Team members: Anders Nielsen (s103457) and Joachim Friis (s093256)
-
 ## Setup
 
 To get up and running easily, install node and type:
