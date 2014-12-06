@@ -1,4 +1,4 @@
-var server = require('./raft/server')
+var Server = require('./raft/server')
 var DirectAsync = require('./raft/protocol/direct_async')
 var Simulator = require('./raft_sim/simulator')
 
@@ -15,7 +15,5 @@ raft.buildCluster = function(options) {
 raft._range = function(to) {
   return Array.apply(null, Array(to)).map(function (_, i) {return i;});
 }
-
-raft.Server = server.Server;
 
 module.exports = raft;
