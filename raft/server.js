@@ -40,45 +40,45 @@ function Server(id, state, log, options) {
 };
 
 /**
-* @param {number} peerId - The id of the peer.
-* @returns the next index in the log of the given peer
-*/
+ * @param {number} peerId - The id of the peer.
+ * @returns the next index in the log of the given peer
+ */
 Server.prototype.nextIndexFor = function(peerId) {
   return this.leaderState.nextIndexFor(peerId);
 };
 
 /**
-* @param {number} peerId - The id of the peer.
-* @returns the lowest index that matches with the given peer
-*/
+ * @param {number} peerId - The id of the peer.
+ * @returns the lowest index that matches with the given peer
+ */
 Server.prototype.matchIndexFor = function(peerId) {
   return this.leaderState.matchIndexFor(peerId);
 };
 
 /**
-* Simulates the server is crashed.
-*/
+ * Simulates the server is crashed.
+ */
 Server.prototype.crash = function() {
   this._becomeFollower();
   this.isDown = true;
 };
 
 /**
-* Simulates the server is restarted and functional again.
-*/
+ * Simulates the server is restarted and functional again.
+ */
 Server.prototype.restart = function() {
   this._resetElectionTimer();
   this.isDown = false;
 }
 
 /**
-* Method for handling a received request from the Raft client.
-*
-* @param {object} logEntry - An object with value and term.
-* @returns a response to the client with indication whether the request
-*   is successful and if not an id of the leader. leaderId is undefined if
-*   there is no current leader.
-*/
+ * Method for handling a received request from the Raft client.
+ *
+ * @param {object} logEntry - An object with value and term.
+ * @returns a response to the client with indication whether the request
+ *   is successful and if not an id of the leader. leaderId is undefined if
+ *   there is no current leader.
+ */
 Server.prototype.onReceiveClientRequest = function(logEntry) {
   if (this.isDown) return;
   if (this.isLeader()) {
@@ -96,32 +96,32 @@ Server.prototype.onReceiveClientRequest = function(logEntry) {
 };
 
 /**
-* @returns the last entry of the log.
-*/
+ * @returns the last entry of the log.
+ */
 Server.prototype.lastLogEntry = function() {
   return this.log.lastEntry();
 };
 
 /**
-* Adds a peer to the server list of other peers in the Raft cluster.
-* @param {Server} server - The Server to be added as peer
-*/
+ * Adds a peer to the server list of other peers in the Raft cluster.
+ * @param {Server} server - The Server to be added as peer
+ */
 Server.prototype.addPeer = function(server){
   this.cluster.addPeer(server);
 };
 
 /**
-* @returns true if the server is leader, else false.
-*/
+ * @returns true if the server is leader, else false.
+ */
 Server.prototype.isLeader = function() {
   return this.state == 'leader';
 };
 
 /**
-* Method for handling a timeout.
-* If the server is not down or is a leader it will become a candidate and
-* start a new election.
-*/
+ * Method for handling a timeout.
+ * If the server is not down or is a leader it will become a candidate and
+ * start a new election.
+ */
 Server.prototype.onTimeout = function(){
   if (this.isLeader() || this.isDown) return;
   this._becomeCandidate();
@@ -129,12 +129,12 @@ Server.prototype.onTimeout = function(){
 };
 
 /**
-* Send a vote request to a given peer.
-* Invokes a VoteRequestRPC on the given targetPeer through the protocol with
-* the id and a VoteRequestRPC object.
-* @param {Server} targetPeer - The Server of the peer that should receive the vote.
-* @returns a result of the invoked VoteRequestRPC
-*/
+ * Send a vote request to a given peer.
+ * Invokes a VoteRequestRPC on the given targetPeer through the protocol with
+ * the id and a VoteRequestRPC object.
+ * @param {Server} targetPeer - The Server of the peer that should receive the vote.
+ * @returns a result of the invoked VoteRequestRPC
+ */
 Server.prototype.invokeVoteRequest = function(targetPeer) {
   if (this.isDown) return;
   return this.protocol.invokeVoteRequest(
@@ -150,14 +150,14 @@ Server.prototype.invokeVoteRequest = function(targetPeer) {
 };
 
 /**
-* Method for handling a RequestVoteRPC.
-* If it is not down and the vote is seen as valid, it will grant the vote
-* and set to vote for the requesting candidate. If the vote is not valid
-* it will not grant the vote.
-* @param {number} sourcePeerId - The id of the candidate Server
-* @param {object} requestVote - The RequestVoteRPC object.
-* @returns a result from invoking the vote response through the protocol.
-*/
+ * Method for handling a RequestVoteRPC.
+ * If it is not down and the vote is seen as valid, it will grant the vote
+ * and set to vote for the requesting candidate. If the vote is not valid
+ * it will not grant the vote.
+ * @param {number} sourcePeerId - The id of the candidate Server
+ * @param {object} requestVote - The RequestVoteRPC object.
+ * @returns a result from invoking the vote response through the protocol.
+ */
 Server.prototype.onReceiveRequestVote = function(sourcePeerId, requestVote) {
   this._onRemoteProcedureCall(requestVote);
   if (this.isDown) return;
@@ -177,20 +177,20 @@ Server.prototype.onReceiveRequestVote = function(sourcePeerId, requestVote) {
 };
 
 /**
-* Method for handling an AppendEntriesRPC.
-*
-* If it is not down it will:
-*   - Reset vote
-*   - Reset election timer
-*   - Become follower
-*   - Delete inconsistent log entries compared to leader
-*   - Append the entries given in the AppendEntriesRPC
-*   - Return response result to the leader
-*
-* @param {number} sourcePeerId - The id of the leader invoking AppendEntriesRPC
-* @param {object} appendEntries - The AppendEntriesRPC object.
-* @returns the result of invoking a response to the leader through the protocol
-*/
+ * Method for handling an AppendEntriesRPC.
+ *
+ * If it is not down it will:
+ *   - Reset vote
+ *   - Reset election timer
+ *   - Become follower
+ *   - Delete inconsistent log entries compared to leader
+ *   - Append the entries given in the AppendEntriesRPC
+ *   - Return response result to the leader
+ *
+ * @param {number} sourcePeerId - The id of the leader invoking AppendEntriesRPC
+ * @param {object} appendEntries - The AppendEntriesRPC object.
+ * @returns the result of invoking a response to the leader through the protocol
+ */
 Server.prototype.onReceiveAppendEntries = function(sourcePeerId, appendEntries) {
   this._onRemoteProcedureCall(appendEntries);
   if (this.isDown) return;
@@ -216,10 +216,10 @@ Server.prototype.onReceiveAppendEntries = function(sourcePeerId, appendEntries) 
 };
 
 /**
-* Handles resopnse from a RequestVoteRPC.
-* If it is not the leader or is down it will become leader if the given
-* vote results in the server having the majority of votes.
-*/
+ * Handles resopnse from a RequestVoteRPC.
+ * If it is not the leader or is down it will become leader if the given
+ * vote results in the server having the majority of votes.
+ */
 Server.prototype.invokeVoteResponse = function(requestVoteResult) {
   this._onRemoteProcedureCall(requestVoteResult);
   if (this.isDown || this.isLeader()) return;
@@ -229,16 +229,16 @@ Server.prototype.invokeVoteResponse = function(requestVoteResult) {
 };
 
 /**
-* Handle response from an AppendEntriesRPC request.
-* If it is not down and:
-*   - the ApendEntriesRPC is successful:
-*     - it will set the matchindex and nextindex for the given peer
-*   - the AppendEntriesRPC is not successful:
-*     - it will decrement the next index for the given peer
-* @param {number} targetPeerid - The server id of the peer originally receiving the RequestVoteRPC.
-* @param {object} appendEntriesResult - The result of the RequestVoteRPC.
-* @returns a result of the invoked VoteRequestRPC
-*/
+ * Handle response from an AppendEntriesRPC request.
+ * If it is not down and:
+ *   - the ApendEntriesRPC is successful:
+ *     - it will set the matchindex and nextindex for the given peer
+ *   - the AppendEntriesRPC is not successful:
+ *     - it will decrement the next index for the given peer
+ * @param {number} targetPeerid - The server id of the peer originally receiving the RequestVoteRPC.
+ * @param {object} appendEntriesResult - The result of the RequestVoteRPC.
+ * @returns a result of the invoked VoteRequestRPC
+ */
 Server.prototype.invokeAppendEntriesResponse = function(targetPeerId, appendEntriesResult) {
   this._onRemoteProcedureCall(appendEntriesResult);
   if (this.isDown) return;
@@ -257,12 +257,12 @@ Server.prototype.invokeAppendEntriesResponse = function(targetPeerId, appendEntr
 };
 
 /**
-* Invoke AppendEntriesRPC on the given peer.
-* If it is leader and is not down it will send the RPC with relevant data
-* for the given peer to be in consensus.
-* @param {number} targetPeerId - The id of the peer that should receive the AppendEntriesRPC
-* @returns a result from invoking the AppendEntriesRPC through the protocol.
-*/
+ * Invoke AppendEntriesRPC on the given peer.
+ * If it is leader and is not down it will send the RPC with relevant data
+ * for the given peer to be in consensus.
+ * @param {number} targetPeerId - The id of the peer that should receive the AppendEntriesRPC
+ * @returns a result from invoking the AppendEntriesRPC through the protocol.
+ */
 Server.prototype.invokeAppendEntries = function(targetPeerId) {
   if (this.isDown || !this.isLeader()) return;
   var prevLogIndex = this.leaderState.nextIndexFor(targetPeerId) - 1;
