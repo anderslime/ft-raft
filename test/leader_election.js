@@ -16,31 +16,29 @@ var assertOneLeader = function(servers) {
 
 describe("LeaderElection: the system", function() {
   it("elects a new leader on initialization", function(done) {
-    var directProtocol = new Direct(null, {});
-    var cluster = raft.buildCluster({
+    var simulator = raft.buildCluster({
       clusterSize: 5,
       heartbeatDelay: 1,
       electionTimerInterval: [150, 300],
-      protocol: directProtocol
+      protocol: new Direct(null, {})
     });
     setTimeout(function() {
-      assertOneLeader(cluster.servers);
+      assertOneLeader(simulator.servers);
       done();
     }, 1000);
   });
 
   it("elects a new leader when the leader crashes", function(done) {
-    var directProtocol = new Direct(null, {});
-    var cluster = raft.buildClusterWithLeader({
+    var simulator = raft.buildClusterWithLeader({
       clusterSize: 5,
       heartbeatDelay: 1,
       electionTimerInterval: [150, 300],
-      protocol: directProtocol
+      protocol: new Direct(null, {})
     });
-    crashLeader(cluster.servers);
-    assert.equal(countLeaders(cluster.servers), 0);
+    crashLeader(simulator.servers);
+    assert.equal(countLeaders(simulator.servers), 0);
     setTimeout(function() {
-      assertOneLeader(cluster.servers);
+      assertOneLeader(simulator.servers);
       done();
     }, 1000);
   });

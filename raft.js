@@ -14,11 +14,12 @@ raft.buildCluster = function(options) {
 
 raft.buildClusterWithLeader = function(options) {
   var clusterSize = options.clusterSize;
-  return new Simulator(raft._range(clusterSize).map(function(index) {
+  var simulator = new Simulator(raft._range(clusterSize).map(function(index) {
     options.protocol = options.protocol || new DirectAsync(null, options);
-    var state = index === 0 ? 'leader' : 'follower';
-    return new Server(index + 1, state, null, options);
+    return new Server(index + 1, 'follower', null, options);
   }));
+  simulator.servers[0]._becomeLeader();
+  return simulator;
 };
 
 raft._range = function(to) {

@@ -1,7 +1,7 @@
 var Log = require('./log');
 var Cluster = require('./cluster');
 var LeaderState = require('./leader_state');
-var DirectAsync = require('./protocol/direct');
+var Direct = require('./protocol/direct');
 
 DEFAULT_HEARTBEAT_DELAY = 100;
 DEFAULT_ELECTION_TIMER_INTERVAL = [1500, 3000];
