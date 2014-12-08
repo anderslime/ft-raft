@@ -269,7 +269,7 @@ describe("Rules for Candidates", function() {
       server1.currentTerm = 2;
       var server2 = new Server(2, 'follower', new Log([{"index": 1, "term": 1}]));
       server2.currentTerm = 2;
-      server1.log.append({"index": 2, "term": 1});
+      server1.log.appendEntry({"index": 2, "term": 1});
       updatePeers([server1, server2]);
       var result = server1.invokeAppendEntries(server2.id);
       assert.deepEqual(server2.log.logEntries, [{"index": 1, "term": 1}, {"index": 2, "term": 1}]);

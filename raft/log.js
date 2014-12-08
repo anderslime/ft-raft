@@ -8,15 +8,31 @@ function Log(logEntries) {
 };
 
 /**
- * Append log entry or entries to the log.
- * If an array is given it appends the whole array
- * If it is a single log entry, the log entry is appended.
+ * Appends an entry from the client. This will also assign an index to the entry.
+ * @param {object} logEntry - The log entry to be appended
+ */
+Log.prototype.appendClientEntry = function(logEntry) {
+  logEntry.index = this.lastIndex() + 1;
+  this.logEntries.push(logEntry);
+};
+
+/**
+ * Appends a list of entries to the log if they are not already appended.
+ * @param {Array} logEntry - An Array of log entries
+ */
+Log.prototype.appendEntries = function(logEntries) {
+  var _me = this;
+  logEntries.forEach(function(logEntry) {
+    _me.appendEntry(logEntry);
+  });
+};
+
+/**
+ * Appends an entry to the log if it is not already appended.
  * @param {object} logEntry - An array of or single log entry
  */
-Log.prototype.append = function(logEntry) {
-  if (Array.isArray(logEntry)) {
-    this._appendLogEntries(logEntry);
-  } else {
+Log.prototype.appendEntry = function(logEntry) {
+  if (logEntry.index > this.lastIndex()) {
     this.logEntries.push(logEntry);
   }
 };

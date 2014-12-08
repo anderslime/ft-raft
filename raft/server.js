@@ -82,7 +82,7 @@ Server.prototype.restart = function() {
 Server.prototype.onReceiveClientRequest = function(logEntry) {
   if (this.isDown) return;
   if (this.isLeader()) {
-    this.log.append({"value": logEntry.value, "term": this.currentTerm});
+    this.log.appendClientEntry({"value": logEntry.value, "term": this.currentTerm});
     return {
       "isSuccessful": true,
       "leaderId": this.id
@@ -200,7 +200,7 @@ Server.prototype.onReceiveAppendEntries = function(sourcePeerId, appendEntries) 
   if (!this._containsLogEntryWithSameTerm(appendEntries)) {
     this._deleteLogEntriesFollowingAndIncluding(appendEntries.prevLogIndex);
   }
-  this.log.append(appendEntries.entries);
+  this.log.appendEntries(appendEntries.entries);
   if (appendEntries.leaderCommit > this.commitIndex) {
     this.commitIndex = Math.min(appendEntries.leaderCommit, this._lastLogIndex());
   }
