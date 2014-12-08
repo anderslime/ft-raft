@@ -7,8 +7,17 @@ var raft = {};
 raft.buildCluster = function(options) {
   var clusterSize = options.clusterSize;
   return new Simulator(raft._range(clusterSize).map(function(index) {
-    options.protocol = new DirectAsync(null, options);
+    options.protocol = options.protocol || new DirectAsync(null, options);
     return new Server(index + 1, 'follower', null, options);
+  }));
+};
+
+raft.buildClusterWithLeader = function(options) {
+  var clusterSize = options.clusterSize;
+  return new Simulator(raft._range(clusterSize).map(function(index) {
+    options.protocol = options.protocol || new DirectAsync(null, options);
+    var state = index === 0 ? 'leader' : 'follower';
+    return new Server(index + 1, state, null, options);
   }));
 };
 
